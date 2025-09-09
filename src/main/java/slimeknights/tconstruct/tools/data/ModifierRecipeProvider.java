@@ -554,15 +554,15 @@ public class ModifierRecipeProvider extends BaseRecipeProvider {
                          .setTools(TinkerTags.Items.LAUNCHERS)
                          .saveSalvage(consumer, prefix(ModifierIds.punch, upgradeSalvage))
                          .save(consumer, prefix(ModifierIds.punch, upgradeFolder));
-    ModifierRecipeBuilder.modifier(TinkerModifiers.impaling)
+    ModifierRecipeBuilder.modifier(ModifierIds.arrowPierce)
                          .addInput(Items.POINTED_DRIPSTONE)
                          .addInput(Items.POINTED_DRIPSTONE)
                          .addInput(Items.POINTED_DRIPSTONE)
                          .setMaxLevel(4) // same max as vanilla
                          .setSlots(SlotType.UPGRADE, 1)
-                         .setTools(TinkerTags.Items.BOWS) // impaling on longbows sounds fun in theory, may reconsider once ricochet is coded
-                         .saveSalvage(consumer, prefix(TinkerModifiers.impaling, upgradeSalvage))
-                         .save(consumer, prefix(TinkerModifiers.impaling, upgradeFolder));
+                         .setTools(TinkerTags.Items.BOWS) // pierce on longbows sounds fun in theory, may reconsider once ricochet is coded
+                         .saveSalvage(consumer, prefix(ModifierIds.arrowPierce, upgradeSalvage))
+                         .save(consumer, prefix(ModifierIds.arrowPierce, upgradeFolder));
     ModifierRecipeBuilder.modifier(ModifierIds.freezing)
                          .addInput(Items.POWDER_SNOW_BUCKET)
                          .setMaxLevel(3)
@@ -1263,6 +1263,15 @@ public class ModifierRecipeProvider extends BaseRecipeProvider {
       .setTools(ingredientFromTags(TinkerTags.Items.MELEE_WEAPON, TinkerTags.Items.FISHING_RODS))
       .saveSalvage(consumer, prefix(ModifierIds.channeling, abilitySalvage))
       .save(consumer, prefix(ModifierIds.channeling, abilityFolder));
+    ModifierRecipeBuilder.modifier(ModifierIds.fins)
+      .addInput(ItemTags.FISHES)
+      .addInput(Blocks.PRISMARINE_BRICKS)
+      .addInput(ItemTags.FISHES)
+      .setMaxLevel(1).checkTraitLevel()
+      .setSlots(SlotType.UPGRADE, 1)
+      .setTools(TinkerTags.Items.MELEE_WEAPON)
+      .saveSalvage(consumer, prefix(ModifierIds.fins, upgradeSalvage))
+      .save(consumer, prefix(ModifierIds.fins, upgradeFolder));
 
     // fluid stuff
     ModifierRecipeBuilder.modifier(TinkerModifiers.melting)

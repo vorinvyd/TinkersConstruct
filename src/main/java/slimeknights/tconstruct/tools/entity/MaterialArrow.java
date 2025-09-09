@@ -27,6 +27,8 @@ import slimeknights.tconstruct.tools.TinkerTools;
 public class MaterialArrow extends AbstractArrow implements ToolProjectile {
   /** Key to sync the stack to the client */
   protected static final EntityDataAccessor<ItemStack> STACK = SynchedEntityData.defineId(MaterialArrow.class, EntityDataSerializers.ITEM_STACK);
+  /** Movement speed in water */
+  protected static final EntityDataAccessor<Float> WATER_INERTIA = SynchedEntityData.defineId(MaterialArrow.class, EntityDataSerializers.FLOAT);
 
   private ItemStack stack = ItemStack.EMPTY;
   private IToolStackView tool = null;
@@ -66,7 +68,10 @@ public class MaterialArrow extends AbstractArrow implements ToolProjectile {
     return tool;
   }
 
-  /** Called when the arrow is created to set initial properties */
+  /**
+   * Called when the arrow is created to set initial properties.
+   * @see ThrownShuriken#onCreate(ItemStack, LivingEntity)
+   */
   public void onCreate(ItemStack stack, LivingEntity shooter) {
     setStack(stack);
     if (!stack.isEmpty()) {
@@ -74,9 +79,11 @@ public class MaterialArrow extends AbstractArrow implements ToolProjectile {
       IToolStackView tool = getTool();
       EntityModifierCapability.getCapability(this).addModifiers(tool.getModifiers());
       setBaseDamage(ConditionalStatModifierHook.getModifiedStat(tool, shooter, ToolStats.PROJECTILE_DAMAGE));
+      this.entityData.set(WATER_INERTIA, ConditionalStatModifierHook.getModifiedStat(tool, shooter, ToolStats.WATER_INERTIA));
     }
   }
 
+  /** @see ThrownShuriken#shoot(double, double, double, float, float)  */
   @Override
   public void shoot(double pX, double pY, double pZ, float velocity, float inaccuracy) {
     if (!stack.isEmpty() && getOwner() instanceof LivingEntity shooter) {
@@ -99,6 +106,12 @@ public class MaterialArrow extends AbstractArrow implements ToolProjectile {
 
 
   /* Stats */
+
+  @Override
+  protected float getWaterInertia() {
+    return entityData.get(WATER_INERTIA);
+  }
+
   // need to replace some setters with adders so vanilla bows work with our logic
 
   @Override
@@ -129,6 +142,7 @@ public class MaterialArrow extends AbstractArrow implements ToolProjectile {
   protected void defineSynchedData() {
     super.defineSynchedData();
     this.entityData.define(STACK, ItemStack.EMPTY);
+    this.entityData.define(WATER_INERTIA, 0.6f);
   }
 
   @Override
@@ -144,11 +158,13 @@ public class MaterialArrow extends AbstractArrow implements ToolProjectile {
 
   /* NBT */
   private static final String KEY_STACK = "stack";
+  private static final String KEY_WATER_INERTIA = "water_inertia";
 
   @Override
   public void addAdditionalSaveData(CompoundTag tag) {
     super.addAdditionalSaveData(tag);
     tag.put(KEY_STACK, this.stack.save(new CompoundTag()));
+    tag.putFloat(KEY_WATER_INERTIA, this.entityData.get(WATER_INERTIA));
   }
 
   @Override
@@ -157,5 +173,6 @@ public class MaterialArrow extends AbstractArrow implements ToolProjectile {
     if (tag.contains(KEY_STACK, CompoundTag.TAG_COMPOUND)) {
       setStack(ItemStack.of(tag.getCompound(KEY_STACK)));
     }
+    this.entityData.set(WATER_INERTIA, tag.getFloat(KEY_WATER_INERTIA));
   }
 }
