@@ -374,6 +374,8 @@
 
   "item.tconstruct.tool_binding_cast": "Tool Binding Gold Cast",
   "item.tconstruct.tough_binding_cast": "Tough Collar Gold Cast",
+  "item.tconstruct.arrow_cast": "Arrow Gold Pattern",
+  "item.tconstruct.arrow_cast.tooltip": "Reusable pattern for making arrow heads and shafts in the part builder",
 
   "_comment": "Tool Handle Gold Casts",
 
@@ -1878,9 +1880,29 @@
   "material.tconstruct.twisting_vine.ranged": "Grants +15% draw speed at the cost of taking 1 damage when you put down the tool",
   "material.tconstruct.twisting_vine.armor": "Grants +10% knockback resistance at the cost of taking 2 damage when you remove the armor",
 
+  "material.tconstruct.wool": "Wool",
+  "material.tconstruct.wool.white": "White Wool",
+  "material.tconstruct.wool.orange": "Orange Wool",
+  "material.tconstruct.wool.magenta": "Magenta Wool",
+  "material.tconstruct.wool.light_blue": "Light Blue Wool",
+  "material.tconstruct.wool.yellow": "Yellow Wool",
+  "material.tconstruct.wool.lime": "Lime Wool",
+  "material.tconstruct.wool.pink": "Pink Wool",
+  "material.tconstruct.wool.gray": "Gray Wool",
+  "material.tconstruct.wool.light_gray": "Light Gray Wool",
+  "material.tconstruct.wool.cyan": "Cyan Wool",
+  "material.tconstruct.wool.purple": "Purple Wool",
+  "material.tconstruct.wool.blue": "Blue Wool",
+  "material.tconstruct.wool.brown": "Brown Wool",
+  "material.tconstruct.wool.green": "Green Wool",
+  "material.tconstruct.wool.red": "Red Wool",
+  "material.tconstruct.wool.black": "Black Wool",
+
   "material.tconstruct.amethyst": "Amethyst",
 
   "material.tconstruct.prismarine": "Prismarine",
+
+  "material.tconstruct.earthslime": "Earthslime",
 
   "material.tconstruct.skyslime": "Skyslime",
 
@@ -2015,7 +2037,6 @@
   "material.tconstruct.ancient.ranged": "Available on melting pans, war picks, and from bartering. Each level grants +1 ability slot at the cost of -10% draw speed, and +10% gravity.",
   "material.tconstruct.ancient.armor": "Obtained on plate armor in bastions, battle signs, melting pans, and from bartering. Each level grants +1 ability slot at the cost of +10% gravity, and -10% movement speed or -10% attack speed on shields.",
   "material.tconstruct.netherite":  "Netherite",
-  "material.tconstruct.earthslime": "Earthslime",
   "material.tconstruct.blood":      "Blood",
   "material.tconstruct.magma":      "Magma",
   "material.tconstruct.ichor":      "Ichor",
@@ -2294,6 +2315,9 @@
   "modifier.tconstruct.power": "Power",
   "modifier.tconstruct.power.flavor": "The power within becomes the power without",
   "modifier.tconstruct.power.description": "Boosts damage of arrows and other launched projectiles",
+  "modifier.tconstruct.keen": "Keen",
+  "modifier.tconstruct.keen.flavor": "How Keen?",
+  "modifier.tconstruct.keen.description": "Boosts damage when the projectile hits the target",
   "modifier.tconstruct.underbowed": "Underbowed",
   "modifier.tconstruct.underbowed.flavor": "The power without becomes the power within",
   "modifier.tconstruct.underbowed.description": "Reduces the power of the launcher",
@@ -2303,6 +2327,9 @@
   "modifier.tconstruct.punch": "Punch",
   "modifier.tconstruct.punch.flavor": "The classic boxing glove arrow",
   "modifier.tconstruct.punch.description": "Makes arrows apply additional knockback",
+  "modifier.tconstruct.drawback": "Drawback",
+  "modifier.tconstruct.drawback.flavor": "Fishing rod arrow",
+  "modifier.tconstruct.drawback.description": "Causes the arrow to apply knockback in the opposite direction, pulling in the target",
   "modifier.tconstruct.impaling": "Arrow Pierce",
   "modifier.tconstruct.impaling.flavor": "Just keeps on going and going and going",
   "modifier.tconstruct.impaling.description": "Arrows keep moving after hitting a target, potentially hitting more targets",
@@ -2769,6 +2796,9 @@
   "modifier.tconstruct.jagged.description": "Every point durability lost increases damage, but decreases mining speed",
   "modifier.tconstruct.jagged.mining_speed": "Mining Speed",
   "modifier.tconstruct.jagged.attack_damage": "Melee Damage",
+  "modifier.tconstruct.tipped": "Tippable",
+  "modifier.tconstruct.tipped.flavor": "Could be improved",
+  "modifier.tconstruct.tipped.description": "Upon hit, applies the effects of the potion casted on this projectile",
   "modifier.tconstruct.stonebound": "Stonebound",
   "modifier.tconstruct.stonebound.flavor": "Your tool absolutely loves stone!",
   "modifier.tconstruct.stonebound.description": "The tool mines faster as it wears out, but does less damage",
@@ -2786,6 +2816,9 @@
   "modifier.tconstruct.woodwind": "Woodwind",
   "modifier.tconstruct.woodwind.flavor": "Song of air",
   "modifier.tconstruct.woodwind.description": "Moves more freely in the wind, granting a large accuracy bonus. Some even claim to hear music as it flies.",
+  "modifier.tconstruct.soft": "Soft",
+  "modifier.tconstruct.soft.flavor": "Friendly weapon",
+  "modifier.tconstruct.soft.description": "Reduces the projectile power to 0.",
   "modifier.tconstruct.stringy": "Stringy",
   "modifier.tconstruct.stringy.flavor": "Like cheese, but less tasty",
   "modifier.tconstruct.stringy.description": "Tool can be repaired using string",
@@ -3433,6 +3466,7 @@
   "recipe.tconstruct.enchantment_converting.too_few": "Need to provide more inputs to convert an enchantment of a higher level",
 
   "recipe.tconstruct.part_swapping.too_many_parts": "Table is too small to swap parts on this tool",
+  "recipe.tconstruct.part_swapping.too_few_inputs": "Tool stack size is too small to perform this part swap",
 
   "recipe.tconstruct.modifier.not_enough_slot": "Need at least 1 %s slot to add this modifier",
   "recipe.tconstruct.modifier.not_enough_slots": "Need at least %s %s slots to add this modifier",

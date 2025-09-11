@@ -1,10 +1,12 @@
 package slimeknights.tconstruct.tools.data.material;
 
 import net.minecraft.data.PackOutput;
+import net.minecraft.world.item.DyeColor;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import slimeknights.tconstruct.library.client.data.material.AbstractMaterialRenderInfoProvider;
 import slimeknights.tconstruct.library.client.data.material.AbstractMaterialSpriteProvider;
 import slimeknights.tconstruct.library.materials.definition.IMaterial;
+import slimeknights.tconstruct.library.materials.definition.MaterialVariantId;
 import slimeknights.tconstruct.library.tools.helper.ToolBuildHandler;
 import slimeknights.tconstruct.shared.block.SlimeType;
 
@@ -41,6 +43,11 @@ public class MaterialRenderInfoProvider extends AbstractMaterialRenderInfoProvid
     buildRenderInfo(MaterialIds.granite);
     buildRenderInfo(MaterialIds.deepslate);
     buildRenderInfo(MaterialIds.blackstone);
+    // tier 1 - wool
+    redirect(MaterialIds.wool, MaterialVariantId.create(MaterialIds.wool, DyeColor.WHITE.getName()));
+    for (DyeColor color : DyeColor.values()) {
+      buildRenderInfo(MaterialVariantId.create(MaterialIds.wool, color.getName()));
+    }
 
     // tier 2
     buildRenderInfo(MaterialIds.iron).color(0xD8D8D8).fallbacks("metal");
@@ -117,6 +124,7 @@ public class MaterialRenderInfoProvider extends AbstractMaterialRenderInfoProvid
     // ammo
     buildRenderInfo(MaterialIds.amethyst);
     buildRenderInfo(MaterialIds.prismarine);
+    buildRenderInfo(MaterialIds.earthslime);
     buildRenderInfo(MaterialIds.skyslime);
     buildRenderInfo(MaterialIds.blaze);
     buildRenderInfo(MaterialIds.enderPearl);
@@ -130,7 +138,6 @@ public class MaterialRenderInfoProvider extends AbstractMaterialRenderInfoProvid
     buildRenderInfo(MaterialIds.glass);
     buildRenderInfo(MaterialIds.rottenFlesh);
     // slimesuit
-    buildRenderInfo(MaterialIds.earthslime);
     buildRenderInfo(MaterialIds.blood);
     buildRenderInfo(MaterialIds.magma);
     buildRenderInfo(MaterialIds.enderslime);

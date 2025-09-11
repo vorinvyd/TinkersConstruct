@@ -80,6 +80,7 @@ public class ModifierIds {
   public static final ModifierId power = id("power");
   public static final ModifierId underbowed = id("underbowed");
   public static final ModifierId punch = id("punch");
+  public static final ModifierId drawback = id("drawback");
   // TODO 1.20 - change ID to arrow_pierce
   public static final ModifierId arrowPierce = id("impaling");
   public static final ModifierId quickCharge = id("quick_charge");
@@ -160,12 +161,14 @@ public class ModifierIds {
   public static final ModifierId economical = id("economical");
   public static final ModifierId stonebound = id("stonebound");
   public static final ModifierId jagged = id("jagged");
+  public static final ModifierId tipped = id("tipped");
   public static final ModifierId stringy = id("stringy");
   public static final ModifierId unburdened = id("unburdened");
   public static final ModifierId depthProtection = id("depth_protection");
   public static final ModifierId enderclearance = id("enderclearance");
   public static final ModifierId frostshield = id("frostshield");
   public static final ModifierId woodwind = id("woodwind");
+  public static final ModifierId soft = id("soft");
   // traits - tier 2
   public static final ModifierId overgrowth = id("overgrowth");
   public static final ModifierId searing = id("searing");
@@ -199,6 +202,7 @@ public class ModifierIds {
   public static final ModifierId crystalbound = id("crystalbound");
   public static final ModifierId crystalstrike = id("crystalstrike");
   public static final ModifierId spectral = id("spectral");
+  public static final ModifierId keen = id("keen");
   // traits - tier 3 compat
   public static final ModifierId maintained = id("maintained");
   public static final ModifierId ductile = id("ductile");

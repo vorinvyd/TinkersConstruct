@@ -38,6 +38,8 @@ public class MaterialDataProvider extends AbstractMaterialDataProvider {
     addMaterial(MaterialIds.vine,    1, ORDER_BINDING, true);
     // tier 1 - shield cores
     addMaterial(MaterialIds.cactus, 1, ORDER_BINDING, true);
+    // tier 1 - ammo
+    addMaterial(MaterialIds.wool, 1, ORDER_BINDING, true);
 
     // tier 2
     addMaterial(MaterialIds.iron,        2, ORDER_GENERAL, false);
@@ -57,6 +59,7 @@ public class MaterialDataProvider extends AbstractMaterialDataProvider {
     // tier 2 - ammo
     addMaterial(MaterialIds.amethyst,   2, ORDER_REPAIR, false);
     addMaterial(MaterialIds.prismarine, 2, ORDER_REPAIR, true);
+    addMaterial(MaterialIds.earthslime, 2, ORDER_REPAIR, true);
     addMaterial(MaterialIds.skyslime,   2, ORDER_REPAIR, true);
     addMaterial(MaterialIds.blaze,      2, ORDER_REPAIR, true);
     addMaterial(MaterialIds.enderPearl, 2, ORDER_REPAIR, false);
@@ -125,7 +128,6 @@ public class MaterialDataProvider extends AbstractMaterialDataProvider {
     addMaterial(MaterialIds.glass,       2, ORDER_REPAIR, false);
     addMaterial(MaterialIds.rottenFlesh, 1, ORDER_REPAIR, true);
     // slimesuit - textures
-    addMaterial(MaterialIds.earthslime, 1, ORDER_REPAIR, true);
     addMaterial(MaterialIds.blood,      2, ORDER_REPAIR, true);
     addMaterial(MaterialIds.magma,      2, ORDER_REPAIR, true);
     addMaterial(MaterialIds.enderslime, 4, ORDER_REPAIR, true);
