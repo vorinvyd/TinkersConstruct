@@ -1,9 +1,9 @@
 {
   "type": "tconstruct:material",
   "ingredient": {
-    "item": "tconstruct:ender_slime_ball"
+    "item": "tconstruct:dragon_scale"
   },
-  "material": "tconstruct:enderslime",
+  "material": "tconstruct:dragon_scale",
   "needed": 1,
   "value": 1
 }

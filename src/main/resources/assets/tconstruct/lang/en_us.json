@@ -1865,7 +1865,7 @@
   "material.tconstruct.skyslime_vine.slimeskin": "Slimeskin",
   "material.tconstruct.skyslime_vine.flavor": "Float like a butterfly, sting like a bee.",
   "material.tconstruct.skyslime_vine.encyclopedia": "Cancels out the mining speed reduction when not on the ground",
-  "material.tconstruct.skyslime_vine.ranged": "Grants +0.5 accuracy when not on the ground or a ladder",
+  "material.tconstruct.skyslime_vine.ranged": "Grants +0.1 velocity when not on the ground or a ladder",
   "material.tconstruct.skyslime_vine.armor": "Reduces gravity by 20% per piece",
 
   "material.tconstruct.weeping_vine": "Weeping Vine",
@@ -1912,6 +1912,10 @@
   "material.tconstruct.ender_pearl.skull_flavor": "Endermen know how to stay away from harm, and scientists. They have been ignoring my interview requests for weeks!",
   "material.tconstruct.ender_pearl.skull_encyclopedia": "Teleports automatically when attacked by a projectile, and randomly from melee. Has a 15 second cooldown",
 
+  "material.tconstruct.glass": "Glass",
+  "material.tconstruct.glass.skull_flavor": "Whose nice things are being destroyed now, creeper?",
+  "material.tconstruct.glass.skull_encyclopedia": "Holding the helmet interact key while sneaking causes the wearer to explode",
+
 
   "__comment": "Tier 3 Materials",
   "material.tconstruct.slimesteel": "Slimesteel",
@@ -1952,6 +1956,10 @@
   "material.tconstruct.cobalt.armor": "Reduces damage from melee attacks by 10% per level, and boosts movement speed when using items by 5% per max level",
 
   "material.tconstruct.quartz": "Quartz",
+
+  "material.tconstruct.dragon_scale": "Dragon Scale",
+  "material.tconstruct.dragon_scale.flavor": "With this armor, even dragons will fear me!",
+  "material.tconstruct.dragon_scale.armor": "Grants +10% resistance while airborne, and boosts attack damage by 5% per level based on the highest piece.",
 
   "material.tconstruct.manyullyn": "Manyullyn",
   "material.tconstruct.manyullyn.flavor": "The metal that most Tinkers will never pronounce right. Also known as a star cutting material.",
@@ -2012,11 +2020,11 @@
   "material.tconstruct.enderslime_vine.ranged": "Teleports the holder to the location of arrows that land in blocks or swaps the holder with monsters hit by arrows",
   "material.tconstruct.enderslime_vine.armor": "Has a 25% chance per piece of randomly teleporting attackers away",
 
-  "__comment": "Slimesuit materials",
-  "material.tconstruct.glass": "Glass",
-  "material.tconstruct.glass.skull_flavor": "Whose nice things are being destroyed now, creeper?",
-  "material.tconstruct.glass.skull_encyclopedia": "Holding the helmet interact key while sneaking causes the wearer to explode",
+  "material.tconstruct.ichor":      "Ichor",
+  "material.tconstruct.enderslime": "Enderslime",
 
+
+  "__comment": "Slimesuit materials",
 
   "material.tconstruct.rotten_flesh": "Rotten Flesh",
   "material.tconstruct.rotten_flesh.skull_flavor": "This is fine",
@@ -2039,8 +2047,6 @@
   "material.tconstruct.netherite":  "Netherite",
   "material.tconstruct.blood":      "Blood",
   "material.tconstruct.magma":      "Magma",
-  "material.tconstruct.ichor":      "Ichor",
-  "material.tconstruct.enderslime": "Enderslime",
   "material.tconstruct.clay":       "Clay",
   "material.tconstruct.honey":      "Honey",
   "material.tconstruct.venom":      "Venom",
@@ -2722,6 +2728,11 @@
   "modifier.tconstruct.spitting": "Spitting",
   "modifier.tconstruct.spitting.flavor": "Become the better llama",
   "modifier.tconstruct.spitting.description": "Can charge the tool to launch fluid projectiles from the tank, applying the effect to the target. Affected by bow stats.",
+  "modifier.tconstruct.smashing": "Smashing",
+  "modifier.tconstruct.smashing.format": "%s (%s)",
+  "modifier.tconstruct.smashing.flavor": "Shattered",
+  "modifier.tconstruct.smashing.description": "Projectile breaks on hitting an entity, applying the effect of the filled fluid to them.",
+  "modifier.tconstruct.smashing.empty_to_swap": "Cannot increase the capacity of smashing unless empty",
 
   "_comment": "Bonus modifier slots",
   "modifier.tconstruct.creative_slot": "Creative Slot",
@@ -2797,6 +2808,7 @@
   "modifier.tconstruct.jagged.mining_speed": "Mining Speed",
   "modifier.tconstruct.jagged.attack_damage": "Melee Damage",
   "modifier.tconstruct.tipped": "Tippable",
+  "modifier.tconstruct.tipped.format": "Tipped %s (%s)",
   "modifier.tconstruct.tipped.flavor": "Could be improved",
   "modifier.tconstruct.tipped.description": "Upon hit, applies the effects of the potion casted on this projectile",
   "modifier.tconstruct.stonebound": "Stonebound",
@@ -2879,7 +2891,7 @@
   "modifier.tconstruct.airborne": "Airborne",
   "modifier.tconstruct.airborne.flavor": "Take to the skies!",
   "modifier.tconstruct.airborne.description": "Tool no longer is penalized when mining in the air and gains a projectile accuracy bonus",
-  "modifier.tconstruct.airborne.accuracy": "Airborne Accuracy",
+  "modifier.tconstruct.airborne.velocity": "Airborne Velocity",
   "modifier.tconstruct.skyfall": "Skyfall",
   "modifier.tconstruct.skyfall.flavor": "Falling with style!",
   "modifier.tconstruct.skyfall.description": "Reduces the effect of gravity",
@@ -2968,6 +2980,10 @@
   "modifier.tconstruct.tempered_protection.flavor": "Resists the flames!",
   "modifier.tconstruct.tempered_protection.description": "Reduces damage from attackers who are on fire",
   "modifier.tconstruct.tempered_protection.resistance": "Resistance",
+  "modifier.tconstruct.dragonshot": "Dragonshot",
+  "modifier.tconstruct.dragonshot.flavor": "Weapon of a dragon",
+  "modifier.tconstruct.dragonshot.description": "Does extra damage when shot from the air",
+  "modifier.tconstruct.dragonshot.projectile_damage": "Airborne Damage",
 
   "__comment": "Tier 5 Traits",
   "modifier.tconstruct.enderporting": "Enderporting",

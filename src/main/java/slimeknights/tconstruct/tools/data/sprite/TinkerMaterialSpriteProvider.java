@@ -377,18 +377,22 @@ public class TinkerMaterialSpriteProvider extends AbstractMaterialSpriteProvider
 //    buildMaterial(MaterialIds.brass).fallbacks("metal").colorMapper(brassPalette);
 //    buildMaterial(MaterialIds.uranium).fallbacks("metal").colorMapper(uraniumPalette);
 
-    // wool for arrow heads
+    buildMaterial(MaterialIds.dragonScale)
+      .arrowHead().maille()
+      .colorMapper(GreyToColorMapping.builderFromBlack().addARGB(63, 0xFF0B090C).addARGB(102, 0xFF161417).addARGB(140, 0xFF221F22).addARGB(178, 0xFF2A282B).addARGB(216, 0xFF393738).addARGB(255, 0xFF474747).build());
+
+    // wool for arrows
     for (DyeColor color : DyeColor.values()) {
       String name = color.getName();
       buildMaterial(MaterialVariantId.create(MaterialIds.wool, name))
         .variant(color != DyeColor.WHITE)
-        .arrowHead()
+        .arrowHead().arrowShaft()
         .transformer(transformerFromSprite(new ResourceLocation("block/" + name + "_wool"), 0, 0));
     }
 
     // slimeskull
     buildMaterial(MaterialIds.glass)
-      .repairKit().fallbacks("crystal")
+      .repairKit().arrowHead().fallbacks("crystal")
       .colorMapper(GreyToColorMapping.builderFromBlack().addARGB(63, 0xFF7BAEB7).addARGB(102, 0xFFA8D0D9).addARGB(140, 0x00000000).addARGB(216, 0x00000000).addARGB(255, 0xFFD0EAE9).build());
     buildMaterial(MaterialIds.enderPearl)
       .repairKit().arrowHead().fallbacks("rock")
@@ -398,7 +402,7 @@ public class TinkerMaterialSpriteProvider extends AbstractMaterialSpriteProvider
       .colorMapper(GreyToColorMapping.builderFromBlack().addARGB(63, 0xFF28140A).addARGB(102, 0xFF522C10).addARGB(140, 0xFF6F4D1B).addARGB(178, 0xFF6A5D18).addARGB(216, 0xFFB44420).addARGB(255, 0xFFC5815A).build());
     // slimesuit
     buildMaterial(MaterialIds.enderslime)
-      .repairKit()
+      .repairKit().arrowHead()
       .colorMapper(GreyToColorMapping.builderFromBlack().addARGB(63, 0xFF6300B0).addARGB(102, 0xFF790DC6).addARGB(140, 0xFFA936ED).addARGB(178, 0xFFBF58F7).addARGB(216, 0xFFD37CFF).addARGB(255, 0xFFEEBFFF).build());
     buildMaterial(MaterialIds.phantom)
       .repairKit().fallbacks("wood")

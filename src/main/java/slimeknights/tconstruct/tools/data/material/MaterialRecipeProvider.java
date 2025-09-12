@@ -32,8 +32,8 @@ import slimeknights.tconstruct.library.recipe.casting.material.MaterialFluidReci
 import slimeknights.tconstruct.library.recipe.melting.MaterialMeltingRecipeBuilder;
 import slimeknights.tconstruct.shared.TinkerCommons;
 import slimeknights.tconstruct.shared.TinkerMaterials;
-import slimeknights.tconstruct.shared.block.SlimeType;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
+import slimeknights.tconstruct.tools.TinkerModifiers;
 import slimeknights.tconstruct.tools.recipe.severing.SheepShearingRecipe;
 import slimeknights.tconstruct.world.TinkerWorld;
 
@@ -133,6 +133,8 @@ public class MaterialRecipeProvider extends BaseRecipeProvider implements IMater
     materialRecipe(consumer, MaterialIds.enderPearl, Ingredient.of(Tags.Items.ENDER_PEARLS),     1, 1, folder + "ender_pearl");
     materialRecipe(consumer, MaterialIds.amethyst,   Ingredient.of(Tags.Items.GEMS_AMETHYST),    1, 1, folder + "amethyst");
     materialRecipe(consumer, MaterialIds.prismarine, Ingredient.of(Tags.Items.DUSTS_PRISMARINE), 1, 1, folder + "prismarine");
+    materialRecipe(consumer, MaterialIds.glass,      Ingredient.of(Tags.Items.GLASS),            4, 1, folder + "glass");
+    materialRecipe(consumer, MaterialIds.glass,      Ingredient.of(Tags.Items.GLASS_PANES),      1, 1, folder + "glass_pane");
 
     materialRecipe(consumer, MaterialIds.skyslimeVine, Ingredient.of(TinkerWorld.skySlimeVine), 1, 1, folder + "skyslime_vine");
     materialRecipe(consumer, MaterialIds.weepingVine,  Ingredient.of(Items.WEEPING_VINES), 1, 1, folder + "weeping_vine");
@@ -152,7 +154,8 @@ public class MaterialRecipeProvider extends BaseRecipeProvider implements IMater
     materialRecipe(consumer, MaterialIds.nahuatl, Ingredient.of(TinkerMaterials.nahuatl), 1, 1, folder + "nahuatl");
     metalMaterialRecipe(consumer, MaterialIds.amethystBronze, folder, "amethyst_bronze", false);
     metalMaterialRecipe(consumer, MaterialIds.pigIron, folder, "pig_iron", false);
-    materialRecipe(consumer, MaterialIds.obsidian, Ingredient.of(Items.OBSIDIAN), 1, 1, folder + "obsidian");
+    materialRecipe(consumer, MaterialIds.obsidian, Ingredient.of(Items.OBSIDIAN),             4, 1, folder + "obsidian");
+    materialRecipe(consumer, MaterialIds.obsidian, Ingredient.of(TinkerCommons.obsidianPane), 1, 1, folder + "obsidian_pane");
     // misc
     materialRecipe(consumer, MaterialIds.ice, Ingredient.of(Blocks.ICE),        1, 9, folder + "ice/unpacked");
     materialRecipe(consumer, MaterialIds.ice, Ingredient.of(Blocks.PACKED_ICE), 1, 1, folder + "ice/packed");
@@ -177,6 +180,7 @@ public class MaterialRecipeProvider extends BaseRecipeProvider implements IMater
     // debris has no storage block, just ingots and nuggets
     materialRecipe(consumer, MaterialIds.ancient, Ingredient.of(TinkerTags.Items.INGOTS_NETHERITE_SCRAP), 1, 1, folder + "ancient/ingot");
     materialRecipe(consumer, MaterialIds.ancient, Ingredient.of(TinkerTags.Items.NUGGETS_NETHERITE_SCRAP), 1, 9, folder + "ancient/nugget");
+    materialRecipe(consumer, MaterialIds.dragonScale, Ingredient.of(TinkerModifiers.dragonScale), 1, 1, folder + "dragon_scale");
 
     // tier 5
     materialRecipe(consumer, MaterialIds.enderslimeVine, Ingredient.of(TinkerWorld.enderSlimeVine), 1, 1, folder + "enderslime_vine");
@@ -203,15 +207,10 @@ public class MaterialRecipeProvider extends BaseRecipeProvider implements IMater
 
     // slimeskull
     metalMaterialRecipe(consumer, MaterialIds.gold, folder, "gold", false);
-    materialRecipe(consumer, MaterialIds.glass,       Ingredient.of(Tags.Items.GLASS),       1, 1, folder + "glass");
-    materialRecipe(consumer, MaterialIds.glass,       Ingredient.of(Tags.Items.GLASS_PANES), 1, 4, folder + "glass_pane");
     materialRecipe(consumer, MaterialIds.rottenFlesh, Ingredient.of(Items.ROTTEN_FLESH),     1, 1, folder + "rotten_flesh");
     // slimesuit
-    // TODO: use enderslime crystals for repair instead?
-    materialRecipe(consumer, MaterialIds.enderslime, Ingredient.of(TinkerCommons.slimeball.get(SlimeType.ENDER)),    1, 1, folder + "enderslime/ball");
-    materialRecipe(consumer, MaterialIds.enderslime, Ingredient.of(TinkerWorld.congealedSlime.get(SlimeType.ENDER)), 4, 1, folder + "enderslime/congealed");
-    materialRecipe(consumer, MaterialIds.enderslime, Ingredient.of(TinkerWorld.slime.get(SlimeType.ENDER)),          9, 1, folder + "enderslime/block");
-    materialRecipe(consumer, MaterialIds.phantom,    Ingredient.of(Items.PHANTOM_MEMBRANE),    1, 1, folder + "phantom_membrane");
+    materialRecipe(consumer, MaterialIds.enderslime, Ingredient.of(TinkerWorld.enderGeode), 1, 1, folder + "enderslime");
+    materialRecipe(consumer, MaterialIds.phantom,    Ingredient.of(Items.PHANTOM_MEMBRANE), 1, 1, folder + "phantom_membrane");
   }
 
   private void addMaterialSmeltery(Consumer<FinishedRecipe> consumer) {
@@ -257,10 +256,10 @@ public class MaterialRecipeProvider extends BaseRecipeProvider implements IMater
     materialMeltingCasting(consumer, MaterialIds.pigIron,        TinkerFluids.moltenPigIron, folder);
     materialMeltingCasting(consumer, MaterialIds.cobalt,         TinkerFluids.moltenCobalt, folder);
     materialMeltingCasting(consumer, MaterialIds.steel,          TinkerFluids.moltenSteel, folder);
-    materialMeltingCasting(consumer, MaterialIds.obsidian,       TinkerFluids.moltenObsidian, FluidValues.GLASS_BLOCK, folder);
+    materialMeltingCasting(consumer, MaterialIds.obsidian,       TinkerFluids.moltenObsidian, FluidValues.GLASS_PANE, folder);
     // allow rose gold as a bowstring by string composite, means we also get a redundant binding recipe, but thats fine
     materialComposite(consumer,        MaterialIds.string, MaterialIds.roseGold,   TinkerFluids.moltenRoseGold, FluidValues.INGOT, folder);
-    materialMeltingComposite(consumer, MaterialIds.wood,   MaterialIds.nahuatl,    TinkerFluids.moltenObsidian, FluidValues.GLASS_BLOCK, folder);
+    materialMeltingComposite(consumer, MaterialIds.wood,   MaterialIds.nahuatl,    TinkerFluids.moltenObsidian, FluidValues.GLASS_PANE, folder);
     materialMeltingComposite(consumer, MaterialIds.string, MaterialIds.darkthread, TinkerFluids.moltenObsidian, FluidValues.GLASS_PANE, folder);
     MaterialMeltingRecipeBuilder.material(MaterialIds.ice, 10, FluidOutput.fromFluid(Fluids.WATER, FluidType.BUCKET_VOLUME * 9))
       .save(consumer, location(folder + "melting/ice"));
@@ -321,7 +320,7 @@ public class MaterialRecipeProvider extends BaseRecipeProvider implements IMater
     // slimesuit
     materialMeltingCasting(consumer, MaterialIds.gold, TinkerFluids.moltenGold, folder);
     materialMeltingCasting(consumer, MaterialIds.enderPearl, TinkerFluids.moltenEnder, FluidValues.SLIMEBALL, folder);
-    materialMeltingCasting(consumer, MaterialIds.glass, TinkerFluids.moltenGlass, FluidValues.GLASS_BLOCK, folder);
+    materialMeltingCasting(consumer, MaterialIds.glass, TinkerFluids.moltenGlass, FluidValues.GLASS_PANE, folder);
     materialMeltingCasting(consumer, MaterialIds.enderslime, TinkerFluids.enderSlime, FluidValues.SLIMEBALL, folder);
   }
 

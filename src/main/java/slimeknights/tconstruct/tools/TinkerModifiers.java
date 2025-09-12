@@ -84,6 +84,7 @@ import slimeknights.tconstruct.library.modifiers.fluid.entity.FreezeFluidEffect;
 import slimeknights.tconstruct.library.modifiers.fluid.entity.MobEffectFluidEffect;
 import slimeknights.tconstruct.library.modifiers.fluid.entity.PotionFluidEffect;
 import slimeknights.tconstruct.library.modifiers.fluid.entity.PushEntityFluidEffect;
+import slimeknights.tconstruct.library.modifiers.fluid.entity.RandomTeleportFluidEffect;
 import slimeknights.tconstruct.library.modifiers.fluid.entity.RemoveEffectFluidEffect;
 import slimeknights.tconstruct.library.modifiers.fluid.entity.RestoreHungerFluidEffect;
 import slimeknights.tconstruct.library.modifiers.fluid.general.AlternativesFluidEffect;
@@ -300,6 +301,7 @@ import slimeknights.tconstruct.tools.modules.ranged.PunchModule;
 import slimeknights.tconstruct.tools.modules.ranged.QuiverInventoryModule;
 import slimeknights.tconstruct.tools.modules.ranged.RestrictAngleModule;
 import slimeknights.tconstruct.tools.modules.ranged.ReversePunchModule;
+import slimeknights.tconstruct.tools.modules.ranged.SmashingModule;
 import slimeknights.tconstruct.tools.modules.ranged.TippedModule;
 import slimeknights.tconstruct.tools.modules.ranged.TrickQuiverModule;
 import slimeknights.tconstruct.tools.recipe.ArmorDyeingRecipe;
@@ -642,7 +644,7 @@ public final class TinkerModifiers extends TinkerModule {
       // simple
       FluidEffect.ENTITY_EFFECTS.register(getResource("calcified"), StrongBonesModifier.FLUID_EFFECT.getLoader());
       FluidEffect.ENTITY_EFFECTS.register(getResource("extinguish"), FluidEffect.EXTINGUISH_FIRE.getLoader());
-      FluidEffect.ENTITY_EFFECTS.register(getResource("teleport"), FluidEffect.TELEPORT.getLoader());
+      FluidEffect.ENTITY_EFFECTS.register(getResource("teleport"), RandomTeleportFluidEffect.LOADER);
       FluidEffect.BLOCK_EFFECTS.register(getResource("weather"), FluidEffect.WEATHER.getLoader());
       // potions
       FluidEffect.ENTITY_EFFECTS.register(getResource("cure_effects"), CureEffectsFluidEffect.LOADER);
@@ -776,6 +778,7 @@ public final class TinkerModifiers extends TinkerModule {
       ModifierModule.LOADER.register(getResource("freezing_attack"), FreezingAttackModule.LOADER);
       ModifierModule.LOADER.register(getResource("spilling"), SpillingModule.LOADER);
       ModifierModule.LOADER.register(getResource("channeling"), ChannelingModule.LOADER);
+      ModifierModule.LOADER.register(getResource("smashing"), SmashingModule.LOADER);
       // armor
       ModifierModule.LOADER.register(getResource("enderclearance"), EnderclearanceModule.LOADER);
       ModifierModule.LOADER.register(getResource("depth_protection"), DepthProtectionModule.LOADER);
