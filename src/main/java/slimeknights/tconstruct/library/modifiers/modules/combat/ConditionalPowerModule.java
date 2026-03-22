@@ -8,12 +8,12 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.EntityHitResult;
 import org.jetbrains.annotations.ApiStatus.Internal;
 import slimeknights.mantle.data.loadable.record.RecordLoadable;
 import slimeknights.mantle.data.predicate.IJsonPredicate;
 import slimeknights.mantle.data.predicate.entity.LivingEntityPredicate;
-import slimeknights.mantle.data.registry.GenericLoaderRegistry.IHaveLoader;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.json.IntRange;
 import slimeknights.tconstruct.library.json.math.ModifierFormula;
@@ -27,6 +27,7 @@ import slimeknights.tconstruct.library.modifiers.ModifierHooks;
 import slimeknights.tconstruct.library.modifiers.entity.ProjectileWithPower;
 import slimeknights.tconstruct.library.modifiers.hook.ranged.ProjectileHitModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.ranged.ProjectileLaunchModifierHook;
+import slimeknights.tconstruct.library.modifiers.hook.special.sling.SlingForceModifierHook;
 import slimeknights.tconstruct.library.modifiers.modules.ModifierModule;
 import slimeknights.tconstruct.library.modifiers.modules.util.ConditionalStatTooltip;
 import slimeknights.tconstruct.library.modifiers.modules.util.ModifierCondition;
@@ -49,8 +50,8 @@ import java.util.List;
  * @param formula       Power formula
  * @param modifierLevel Modifier level condition
  */
-public record ConditionalPowerModule(IJsonPredicate<LivingEntity> target, IJsonPredicate<LivingEntity> holder, PowerFormula formula, IntRange modifierLevel) implements ModifierModule, ProjectileLaunchModifierHook, ProjectileHitModifierHook, ConditionalStatTooltip {
-  private static final List<ModuleHook<?>> DEFAULT_HOOKS = HookProvider.<ConditionalPowerModule>defaultHooks(ModifierHooks.PROJECTILE_LAUNCH, ModifierHooks.PROJECTILE_HIT, ModifierHooks.TOOLTIP);
+public record ConditionalPowerModule(IJsonPredicate<LivingEntity> target, IJsonPredicate<LivingEntity> holder, PowerFormula formula, IntRange modifierLevel) implements ModifierModule, ProjectileLaunchModifierHook.NoShooter, ProjectileHitModifierHook, SlingForceModifierHook, ConditionalStatTooltip {
+  private static final List<ModuleHook<?>> DEFAULT_HOOKS = HookProvider.<ConditionalPowerModule>defaultHooks(ModifierHooks.PROJECTILE_LAUNCH, ModifierHooks.PROJECTILE_SHOT, ModifierHooks.PROJECTILE_HIT, ModifierHooks.SLING_FORCE, ModifierHooks.TOOLTIP);
   public static final RecordLoadable<ConditionalPowerModule> LOADER = RecordLoadable.create(
     LivingEntityPredicate.LOADER.defaultField("target", ConditionalPowerModule::target),
     LivingEntityPredicate.LOADER.defaultField("holder", ConditionalPowerModule::holder),
@@ -79,7 +80,7 @@ public record ConditionalPowerModule(IJsonPredicate<LivingEntity> target, IJsonP
   }
 
   @Override
-  public RecordLoadable<? extends IHaveLoader> getLoader() {
+  public RecordLoadable<ConditionalPowerModule> getLoader() {
     return LOADER;
   }
 
@@ -89,7 +90,7 @@ public record ConditionalPowerModule(IJsonPredicate<LivingEntity> target, IJsonP
   }
 
   @Override
-  public void onProjectileLaunch(IToolStackView tool, ModifierEntry modifier, LivingEntity shooter, Projectile projectile, @Nullable AbstractArrow arrow, ModDataNBT persistentData, boolean primary) {
+  public void onProjectileShoot(IToolStackView tool, ModifierEntry modifier, @Nullable LivingEntity shooter, ItemStack ammo, Projectile projectile, @Nullable AbstractArrow arrow, ModDataNBT persistentData, boolean primary) {
     // copy projectile multiplier into the arrow damage so we can use it later
     // we use a separate key for ammo vs bow as those may mismatch. But for the same weapon its fine if multiple modifiers reuse it
     persistentData.putFloat(tool.hasTag(TinkerTags.Items.AMMO) ? AMMO_MULTIPLIER : BOW_MULTIPLIER, tool.getMultiplier(ToolStats.PROJECTILE_DAMAGE));
@@ -97,21 +98,37 @@ public record ConditionalPowerModule(IJsonPredicate<LivingEntity> target, IJsonP
 
   @Override
   public boolean onProjectileHitEntity(ModifierNBT modifiers, ModDataNBT persistentData, ModifierEntry modifier, Projectile projectile, EntityHitResult hit, @Nullable LivingEntity attacker, @Nullable LivingEntity target) {
-    if (modifierLevel.test(modifier.getLevel()) && TinkerPredicate.matches(this.target, target) && TinkerPredicate.matches(this.holder, attacker)) {
-      float multiplier = 1;
-      if (persistentData.contains(AMMO_MULTIPLIER, Tag.TAG_ANY_NUMERIC)) {
-        multiplier += persistentData.getFloat(AMMO_MULTIPLIER);
-      }
-      if (persistentData.contains(BOW_MULTIPLIER, Tag.TAG_ANY_NUMERIC)) {
-        multiplier += persistentData.getFloat(BOW_MULTIPLIER);
-      }
-      if (projectile instanceof AbstractArrow arrow) {
-        arrow.setBaseDamage(formula.apply(modifiers, persistentData, modifier, projectile, hit, attacker, target, arrow.getBaseDamage(), multiplier));
-      } else if (projectile instanceof ProjectileWithPower withPower) {
-        withPower.setPower(formula.apply(modifiers, persistentData, modifier, projectile, hit, attacker, target, withPower.getPower(), multiplier));
+    ResourceLocation key = modifier.getId();
+    // if we already boosted power from an entity, don't boost again
+    // minimizes issues with projectile bounces and piercing
+    if (modifierLevel.test(modifier.getLevel()) && !persistentData.getBoolean(key)) {
+      // as soon as we attempt to boost, mark this modifier as having run
+      // means the second entity will not get to apply its boost if the first did not apply it
+      persistentData.putBoolean(key, true);
+      if (TinkerPredicate.matches(this.target, target) && TinkerPredicate.matches(this.holder, attacker)) {
+        float multiplier = 1;
+        if (persistentData.contains(AMMO_MULTIPLIER, Tag.TAG_ANY_NUMERIC)) {
+          multiplier *= persistentData.getFloat(AMMO_MULTIPLIER);
+        }
+        if (persistentData.contains(BOW_MULTIPLIER, Tag.TAG_ANY_NUMERIC)) {
+          multiplier *= persistentData.getFloat(BOW_MULTIPLIER);
+        }
+        if (projectile instanceof AbstractArrow arrow) {
+          arrow.setBaseDamage(formula.apply(modifiers, persistentData, modifier, projectile, hit, attacker, target, arrow.getBaseDamage(), multiplier));
+        } else if (projectile instanceof ProjectileWithPower withPower) {
+          withPower.setPower(formula.apply(modifiers, persistentData, modifier, projectile, hit, attacker, target, withPower.getPower(), multiplier));
+        }
       }
     }
     return false;
+  }
+
+  @Override
+  public float modifySlingForce(IToolStackView tool, ModifierEntry modifier, LivingEntity holder, LivingEntity target, ModifierEntry slingSource, float force, float multiplier) {
+    if (modifierLevel.test(modifier.getLevel()) && ToolStats.PROJECTILE_DAMAGE.supports(tool.getItem()) && this.holder.matches(holder) && this.target.matches(target)) {
+      return formula.apply(tool.getModifiers(), tool.getPersistentData(), modifier, null, null, holder, target, force, multiplier * tool.getMultiplier(ToolStats.PROJECTILE_DAMAGE));
+    }
+    return force;
   }
 
   @Override

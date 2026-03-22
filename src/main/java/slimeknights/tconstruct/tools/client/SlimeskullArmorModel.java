@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.Model;
+import net.minecraft.client.model.PiglinHeadModel;
 import net.minecraft.client.model.SkullModel;
 import net.minecraft.client.model.SkullModelBase;
 import net.minecraft.client.model.geom.EntityModelSet;
@@ -15,7 +16,10 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.WalkAnimationState;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
+import org.joml.Quaternionf;
 import slimeknights.mantle.data.listener.ISafeManagerReloadListener;
 import slimeknights.tconstruct.library.client.armor.ArmorModelManager.ArmorModel;
 import slimeknights.tconstruct.library.client.armor.MultilayerArmorModel;
@@ -24,17 +28,14 @@ import slimeknights.tconstruct.library.client.materials.MaterialRenderInfoLoader
 import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.materials.definition.MaterialId;
 import slimeknights.tconstruct.library.materials.definition.MaterialVariantId;
-import slimeknights.tconstruct.library.tools.helper.ModifierUtil;
 import slimeknights.tconstruct.library.tools.nbt.MaterialIdNBT;
 import slimeknights.tconstruct.library.utils.SimpleCache;
-import slimeknights.tconstruct.tools.TinkerModifiers;
-import slimeknights.tconstruct.tools.data.material.MaterialIds;
+import slimeknights.tconstruct.world.client.BlockModelSkullRenderer;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.function.Function;
 
 /** Model to render a slimeskull helmet with both the helmet and skull */
@@ -42,9 +43,8 @@ public class SlimeskullArmorModel extends MultilayerArmorModel {
   /** Singleton model instance, all data is passed in via setters */
   public static final SlimeskullArmorModel INSTANCE = new SlimeskullArmorModel();
   /** Cache of colors for materials */
-  private static final SimpleCache<String,Integer> MATERIAL_COLOR_CACHE = new SimpleCache<>(mat ->
-    Optional.ofNullable(MaterialVariantId.tryParse(mat))
-            .flatMap(MaterialRenderInfoLoader.INSTANCE::getRenderInfo)
+  private static final SimpleCache<MaterialVariantId,Integer> MATERIAL_COLOR_CACHE = new SimpleCache<>(mat ->
+    MaterialRenderInfoLoader.INSTANCE.getRenderInfo(mat)
             .map(MaterialRenderInfo::vertexColor)
             .orElse(-1));
   /** Listener to clear caches */
@@ -61,6 +61,8 @@ public class SlimeskullArmorModel extends MultilayerArmorModel {
   /** Texture for the head */
   @Nullable
   private SkullModelBase headModel;
+  /** Current animation time for the skull */
+  private float walkAnimation = 0;
 
   private SlimeskullArmorModel() {}
 
@@ -74,18 +76,24 @@ public class SlimeskullArmorModel extends MultilayerArmorModel {
       if (skull != null && texture != null) {
         headModel = skull;
         headTexture = texture;
-        // determine the color to tint the helmet, fallback to enderslime if missing
-        String embellishmentMaterial = ModifierUtil.getPersistentString(stack, TinkerModifiers.embellishment.getId());
-        if (embellishmentMaterial.isEmpty()) {
-          embellishmentMaterial = MaterialIds.enderslime.toString();
+        // determine the color to tint the helmet, fallback to no tint if missing
+        MaterialVariantId material = MaterialIdNBT.from(stack).getMaterial(1);
+        if (IMaterial.UNKNOWN_ID.equals(material)) {
+          headColor = -1;
+        } else {
+          headColor = MATERIAL_COLOR_CACHE.apply(material);
         }
-        headColor = MATERIAL_COLOR_CACHE.apply(embellishmentMaterial);
+
+        // setup walk animation
+        WalkAnimationState walkState = living.getVehicle() instanceof LivingEntity vehicle ? vehicle.walkAnimation : living.walkAnimation;
+        this.walkAnimation = walkState.position();
         return this;
       }
     }
     headTexture = null;
     headModel = null;
     headColor = -1;
+    walkAnimation = 0;
     return this;
   }
 
@@ -94,6 +102,7 @@ public class SlimeskullArmorModel extends MultilayerArmorModel {
     if (base != null && buffer != null) {
       if (model != ArmorModel.EMPTY) {
         matrixStackIn.pushPose();
+        // TODO: this offset messes with the rotation of the skull slightly, though it is barely noticable
         matrixStackIn.translate(0.0D, base.young ? -0.015D : -0.02D, 0.0D);
         matrixStackIn.scale(1.01f, 1.1f, 1.01f);
         super.renderToBuffer(matrixStackIn, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
@@ -111,7 +120,8 @@ public class SlimeskullArmorModel extends MultilayerArmorModel {
         } else {
           matrixStackIn.scale(1.115f, 1.115f, 1.115f);
         }
-        headModel.setupAnim(0, base.head.yRot * 180f / (float)(Math.PI), base.head.xRot * 180f / (float)(Math.PI));
+        matrixStackIn.mulPose((new Quaternionf()).rotationZYX(0, base.head.yRot, base.head.xRot));
+        headModel.setupAnim(walkAnimation, 0, 0);
         renderColored(headModel, matrixStackIn, heaadBuffer, packedLightIn, packedOverlayIn, headColor, red, green, blue, alpha);
         matrixStackIn.popPose();
       }
@@ -129,6 +139,16 @@ public class SlimeskullArmorModel extends MultilayerArmorModel {
   /** Registers a head model and texture, using the default skull model */
   public static void registerHeadModel(MaterialId materialId, ModelLayerLocation headModel, ResourceLocation texture) {
     registerHeadModel(materialId, modelSet -> new SkullModel(modelSet.bakeLayer(headModel)), texture);
+  }
+
+  /** Registers a head model and texture, using the piglin skull model */
+  public static void registerPiglinHeadModel(MaterialId materialId, ModelLayerLocation headModel, ResourceLocation texture) {
+    registerHeadModel(materialId, modelSet -> new PiglinHeadModel(modelSet.bakeLayer(headModel)), texture);
+  }
+
+  /** Registers a skull model using an item as the model */
+  public static void registerBlockModel(MaterialId materialId, ItemStack stack) {
+    registerHeadModel(materialId, modelSet -> new BlockModelSkullRenderer(Minecraft.getInstance().getItemRenderer(), stack), InventoryMenu.BLOCK_ATLAS);
   }
 
   /** Registers a head model and texture, using a custom skull model */

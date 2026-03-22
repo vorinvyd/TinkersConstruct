@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 /** Make the tool display name by displaying all materials that match some criteria. */
-public interface MaterialToolName extends ToolNameHook {
+public interface MaterialToolName extends ToolNameHook.FromDefault {
   /** Translation key for the tool name format string */
   Component MATERIAL_SEPARATOR = TConstruct.makeTranslation("item", "tool.material_separator");
 
@@ -30,8 +30,7 @@ public interface MaterialToolName extends ToolNameHook {
   boolean shouldDisplayMaterial(int index, MaterialStatsId statType, MaterialVariantId material);
 
   @Override
-  default Component getDisplayName(ToolDefinition definition, ItemStack stack, @Nullable IToolStackView tool) {
-    Component itemName = Component.translatable(stack.getItem().getDescriptionId());
+  default Component getDisplayName(ToolDefinition definition, ItemStack stack, @Nullable IToolStackView tool, Component itemName) {
     List<MaterialStatsId> components = ToolMaterialHook.stats(definition);
     // if no materials, direct name
     if (components.isEmpty()) {
@@ -62,16 +61,19 @@ public interface MaterialToolName extends ToolNameHook {
       return nameForMaterial(displayMaterials.iterator().next(), itemName);
     } else {
       // mix of materials get hyphenated
-      MutableComponent builder = Component.literal("");
-      Iterator<MaterialVariantId> iter = displayMaterials.iterator();
-      builder.append(MaterialTooltipCache.getDisplayName(iter.next()));
-      while (iter.hasNext()) {
-        builder.append(MATERIAL_SEPARATOR).append(MaterialTooltipCache.getDisplayName(iter.next()));
+      Set<Component> names = new LinkedHashSet<>(displayMaterials.size());
+      for (MaterialVariantId id : displayMaterials) {
+        names.add(MaterialTooltipCache.getDisplayName(id));
       }
-      materialName = builder;
+      MutableComponent builder = Component.literal("");
+      Iterator<Component> iter = names.iterator();
+      builder.append(iter.next());
+      while (iter.hasNext()) {
+        builder.append(MATERIAL_SEPARATOR).append(iter.next());
+      }
+      // build final name
+      return Component.translatable(TooltipUtil.KEY_FORMAT, builder, itemName);
     }
-    // build final name
-    return Component.translatable(TooltipUtil.KEY_FORMAT, materialName, itemName);
   }
 
   /** Gets the tool name for the given material */

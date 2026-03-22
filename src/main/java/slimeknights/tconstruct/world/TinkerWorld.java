@@ -38,6 +38,7 @@ import net.minecraft.world.level.block.WallSkullBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockBehaviour.OffsetType;
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
@@ -67,12 +68,16 @@ import slimeknights.tconstruct.common.registration.GeodeItemObject;
 import slimeknights.tconstruct.common.registration.GeodeItemObject.BudSize;
 import slimeknights.tconstruct.fluids.TinkerFluids;
 import slimeknights.tconstruct.library.json.loot.equipment.MobEquipmentManager;
+import slimeknights.tconstruct.library.materials.MaterialRegistry;
+import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.utils.Util;
 import slimeknights.tconstruct.shared.TinkerCommons;
 import slimeknights.tconstruct.shared.TinkerMaterials;
 import slimeknights.tconstruct.shared.block.SlimeType;
 import slimeknights.tconstruct.tools.TinkerModifiers;
+import slimeknights.tconstruct.tools.data.material.MaterialIds;
 import slimeknights.tconstruct.world.block.CongealedSlimeBlock;
+import slimeknights.tconstruct.world.block.CrystalClusterBlock;
 import slimeknights.tconstruct.world.block.DirtType;
 import slimeknights.tconstruct.world.block.FoliageType;
 import slimeknights.tconstruct.world.block.PiglinHeadBlock;
@@ -95,6 +100,7 @@ import slimeknights.tconstruct.world.entity.EnderSlimeEntity;
 import slimeknights.tconstruct.world.entity.SkySlimeEntity;
 import slimeknights.tconstruct.world.entity.SlimePlacementPredicate;
 import slimeknights.tconstruct.world.entity.TerracubeEntity;
+import slimeknights.tconstruct.world.item.EndermanHeadItem;
 import slimeknights.tconstruct.world.item.SlimeGrassSeedItem;
 import slimeknights.tconstruct.world.worldgen.trees.SlimeTree;
 
@@ -127,12 +133,20 @@ public final class TinkerWorld extends TinkerModule {
    */
 
   /*
-   * Blocks
+   * Metals
    */
   // ores
   public static final ItemObject<Block> cobaltOre = BLOCKS.register("cobalt_ore", () -> new Block(builder(MapColor.NETHER, SoundType.NETHER_ORE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(10.0F)), BLOCK_ITEM);
   public static final ItemObject<Block> rawCobaltBlock = BLOCKS.register("raw_cobalt_block", () -> new Block(builder(MapColor.COLOR_BLUE, SoundType.NETHER_ORE).instrument(NoteBlockInstrument.BASEDRUM).requiresCorrectToolForDrops().strength(6.0f, 7.0f)), BLOCK_ITEM);
   public static final ItemObject<Item> rawCobalt = ITEMS.register("raw_cobalt", ITEM_PROPS);
+
+  // shards
+  public static final ItemObject<Item> steelShard = ITEMS.register("steel_shard", TOOLTIP_ITEM);
+  public static final ItemObject<Item> cobaltShard = ITEMS.register("cobalt_shard", TOOLTIP_ITEM);
+  public static final ItemObject<Item> knightmetalShard = ITEMS.register("knightmetal_shard", TOOLTIP_ITEM);
+  public static final ItemObject<Block> steelCluster = BLOCKS.register("steel_cluster", () -> new CrystalClusterBlock(Sounds.SKY_CRYSTAL_CHIME.getSound(), 7, 3, clusterProps().mapColor(MapColor.STONE).lightLevel(state -> 5).sound(SoundType.METAL)), TOOLTIP_BLOCK_ITEM);
+  public static final ItemObject<Block> cobaltCluster = BLOCKS.register("cobalt_cluster", () -> new CrystalClusterBlock(Sounds.ICHOR_CRYSTAL_CHIME.getSound(), 7, 3, clusterProps().mapColor(MapColor.COLOR_BLUE).lightLevel(state -> 8).sound(SoundType.NETHERITE_BLOCK)), TOOLTIP_BLOCK_ITEM);
+  public static final ItemObject<Block> knightmetalCluster = BLOCKS.register("knightmetal_cluster", () -> new CrystalClusterBlock(Sounds.ENDER_CRYSTAL_CHIME.getSound(), 7, 3, clusterProps().mapColor(MapColor.GRASS).lightLevel(state -> 12).sound(SoundType.NETHERITE_BLOCK)), TOOLTIP_BLOCK_ITEM);
 
   // slime
   public static final EnumObject<SlimeType, SlimeBlock> slime = Util.make(() -> {
@@ -261,9 +275,9 @@ public final class TinkerWorld extends TinkerModule {
   public static final ResourceKey<BiomeModifier> spawnEnderGeode = key(ForgeRegistries.Keys.BIOME_MODIFIERS, "ender_geode");
 
   // heads
-  public static final EnumObject<TinkerHeadType,SkullBlock>               heads     = BLOCKS.registerEnumNoItem(TinkerHeadType.values(), "head", TinkerWorld::makeHead);
-  public static final EnumObject<TinkerHeadType,WallSkullBlock>           wallHeads = BLOCKS.registerEnumNoItem(TinkerHeadType.values(), "wall_head", TinkerWorld::makeWallHead);
-  public static final EnumObject<TinkerHeadType,StandingAndWallBlockItem> headItems = ITEMS.registerEnum(TinkerHeadType.values(), "head", type -> new StandingAndWallBlockItem(heads.get(type), wallHeads.get(type), new Item.Properties().rarity(Rarity.UNCOMMON), Direction.DOWN));
+  public static final EnumObject<TinkerHeadType,SkullBlock> heads = BLOCKS.registerEnumNoItem(TinkerHeadType.values(), "head", TinkerWorld::makeHead);
+  public static final EnumObject<TinkerHeadType,WallSkullBlock> wallHeads = BLOCKS.registerEnumNoItem(TinkerHeadType.values(), "wall_head", TinkerWorld::makeWallHead);
+  public static final EnumObject<TinkerHeadType,StandingAndWallBlockItem> headItems = ITEMS.registerEnum(TinkerHeadType.values(), "head", TinkerWorld::makeHeadItem);
 
   /*
    * Entities
@@ -289,6 +303,7 @@ public final class TinkerWorld extends TinkerModule {
                       .setCustomClientFactory((spawnEntity, world) -> TinkerWorld.terracubeEntity.get().create(world)), 0xAFB9D6, 0xA1A7B1);
 
   public static final ResourceKey<BiomeModifier> spawnOverworldSlime = key(ForgeRegistries.Keys.BIOME_MODIFIERS, "spawn_overworld_slime");
+  public static final ResourceKey<BiomeModifier> spawnTerracube = key(ForgeRegistries.Keys.BIOME_MODIFIERS, "spawn_terracube");
   public static final ResourceKey<BiomeModifier> spawnEndSlime = key(ForgeRegistries.Keys.BIOME_MODIFIERS, "spawn_end_slime");
 
   /*
@@ -421,7 +436,12 @@ public final class TinkerWorld extends TinkerModule {
     // mob drops
     output.accept(TinkerMaterials.necroticBone);
     output.accept(TinkerModifiers.dragonScale);
-    accept(output, headItems);
+    // skip necronium head unless necronium is enabled
+    headItems.forEach((type, head) -> {
+      if (type != TinkerHeadType.NECRONIUM || MaterialRegistry.getMaterial(MaterialIds.necronium) != IMaterial.UNKNOWN) {
+        output.accept(head);
+      }
+    });
 
     // earth is not in the loop as we only add congealed
     output.accept(congealedSlime.get(SlimeType.EARTH));
@@ -468,8 +488,14 @@ public final class TinkerWorld extends TinkerModule {
     // geodes
     accept(output, earthGeode);
     accept(output, skyGeode);
+    output.accept(steelShard);
+    output.accept(steelCluster);
     accept(output, ichorGeode);
+    output.accept(cobaltShard);
+    output.accept(cobaltCluster);
     accept(output, enderGeode);
+    output.accept(knightmetalShard);
+    output.accept(knightmetalCluster);
   }
 
   /** Add a geode to the creative tab */
@@ -501,5 +527,19 @@ public final class TinkerWorld extends TinkerModule {
       return new PiglinWallHeadBlock(type, props);
     }
     return new WallSkullBlock(type, props);
+  }
+
+  /** Creates a skull wall block for the given head type */
+  private static StandingAndWallBlockItem makeHeadItem(TinkerHeadType type) {
+    Item.Properties properties = new Item.Properties().rarity(Rarity.UNCOMMON);
+    if (type == TinkerHeadType.ENDERMAN) {
+      return new EndermanHeadItem(heads.get(type), wallHeads.get(type), properties, Direction.DOWN);
+    }
+    return new StandingAndWallBlockItem(heads.get(type), wallHeads.get(type), properties, Direction.DOWN);
+  }
+
+  /** Properties for a cluster of shards. */
+  private static Properties clusterProps() {
+    return BlockBehaviour.Properties.of().forceSolidOn().noOcclusion().randomTicks().strength(2.5f).requiresCorrectToolForDrops().pushReaction(PushReaction.DESTROY);
   }
 }

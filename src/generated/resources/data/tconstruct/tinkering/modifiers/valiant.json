@@ -4,8 +4,8 @@
     {
       "type": "tconstruct:conditional_melee_damage",
       "formula": [
-        "$equipment",
-        0.5,
+        "$armor_coverage",
+        1.6,
         "*",
         "$level",
         "*",
@@ -16,16 +16,10 @@
       ],
       "percent": false,
       "variables": {
-        "equipment": {
+        "armor_coverage": {
           "type": "tconstruct:entity",
-          "entity_type": "tconstruct:equipment_count",
-          "fallback": 4.0,
-          "slots": [
-            "feet",
-            "legs",
-            "chest",
-            "head"
-          ],
+          "entity_type": "tconstruct:armor_coverage",
+          "fallback": 1.0,
           "which": "target"
         }
       }
@@ -33,8 +27,10 @@
     {
       "type": "tconstruct:conditional_power",
       "formula": [
-        "$equipment",
-        0.25,
+        "$armor_coverage",
+        0.8,
+        "*",
+        "$level",
         "*",
         "$multiplier",
         "*",
@@ -43,16 +39,10 @@
       ],
       "percent": false,
       "variables": {
-        "equipment": {
+        "armor_coverage": {
           "type": "tconstruct:entity",
-          "entity_type": "tconstruct:equipment_count",
-          "fallback": 4.0,
-          "slots": [
-            "feet",
-            "legs",
-            "chest",
-            "head"
-          ],
+          "entity_type": "tconstruct:armor_coverage",
+          "fallback": 1.0,
           "which": "target"
         }
       }

@@ -10,7 +10,6 @@ import org.jetbrains.annotations.ApiStatus.Internal;
 import slimeknights.mantle.data.loadable.field.ContextKey;
 import slimeknights.mantle.data.loadable.record.RecordLoadable;
 import slimeknights.mantle.data.predicate.IJsonPredicate;
-import slimeknights.mantle.data.registry.GenericLoaderRegistry.IHaveLoader;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.TinkerTags;
 import slimeknights.tconstruct.library.json.LevelingValue;
@@ -61,7 +60,7 @@ public record KnockbackCounterModule(TinkerDataKey<SlotInCharge> slotInCharge, L
   }
 
   @Override
-  public RecordLoadable<? extends IHaveLoader> getLoader() {
+  public RecordLoadable<KnockbackCounterModule> getLoader() {
     return LOADER;
   }
 
@@ -91,6 +90,7 @@ public record KnockbackCounterModule(TinkerDataKey<SlotInCharge> slotInCharge, L
       if (defender.isUsingItem()) {
         EquipmentSlot checkSlot = Util.getSlotType(defender.getUsedItemHand());
         IToolStackView blockingTool = context.getValidTool(checkSlot);
+        // TODO: CounterModule.isBlocking?
         if (blockingTool != null && ModifierUtil.canPerformAction(blockingTool, ToolActions.SHIELD_BLOCK) && defender.getItemBySlot(checkSlot).getUseDuration() - defender.getUseItemRemainingTicks() >= 5) {
           blockingSlot = checkSlot;
         }
@@ -112,7 +112,7 @@ public record KnockbackCounterModule(TinkerDataKey<SlotInCharge> slotInCharge, L
             }
             // all tools that contributed get damaged, consistency with other counter modules
             if (durabilityUsage > 0 && newBonus > 0) {
-              ToolDamageUtil.damageAnimated(tool, durabilityUsage, defender, bouncingSlot);
+              ToolDamageUtil.damageAnimated(bouncingTool, durabilityUsage, defender, bouncingSlot, modifier.getId());
             }
           }
         }

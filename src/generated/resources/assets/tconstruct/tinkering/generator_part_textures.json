@@ -33,6 +33,18 @@
       "stat_type": "tconstruct:repair_kit"
     },
     {
+      "path": "tconstruct:item/tool/parts/ingot",
+      "stat_type": "tconstruct:ingot"
+    },
+    {
+      "path": "tconstruct:block/storage/fallback",
+      "stat_type": "tconstruct:storage_block"
+    },
+    {
+      "path": "tconstruct:tinker_armor/fishing_hook/material",
+      "stat_type": "tconstruct:arrow_head"
+    },
+    {
       "allow_animated": false,
       "path": "tconstruct:tinker_armor/travelers/metal_armor",
       "stat_type": "tconstruct:armor_plating"
@@ -96,43 +108,43 @@
     },
     {
       "allow_animated": false,
-      "path": "tconstruct:item/tool/armor/slime/skull_modifiers/tconstruct_embellishment",
-      "stat_type": "tconstruct:slimesuit"
+      "path": "tconstruct:item/tool/armor/slime/helmet/slime",
+      "stat_type": "tconstruct:slime"
     },
     {
       "allow_animated": false,
-      "path": "tconstruct:item/tool/armor/slime/skull_modifiers/broken/tconstruct_embellishment",
-      "stat_type": "tconstruct:slimesuit"
+      "path": "tconstruct:item/tool/armor/slime/helmet/slime_broken",
+      "stat_type": "tconstruct:slime"
     },
     {
       "allow_animated": false,
-      "path": "tconstruct:item/tool/armor/slime/wings_modifiers/tconstruct_embellishment",
-      "stat_type": "tconstruct:slimesuit"
+      "path": "tconstruct:item/tool/armor/slime/wings/slime",
+      "stat_type": "tconstruct:slime"
     },
     {
       "allow_animated": false,
-      "path": "tconstruct:item/tool/armor/slime/wings_modifiers/broken/tconstruct_embellishment",
-      "stat_type": "tconstruct:slimesuit"
+      "path": "tconstruct:item/tool/armor/slime/wings/slime_broken",
+      "stat_type": "tconstruct:slime"
     },
     {
       "allow_animated": false,
-      "path": "tconstruct:item/tool/armor/slime/shell_modifiers/tconstruct_embellishment",
-      "stat_type": "tconstruct:slimesuit"
+      "path": "tconstruct:item/tool/armor/slime/leggings/slime",
+      "stat_type": "tconstruct:slime"
     },
     {
       "allow_animated": false,
-      "path": "tconstruct:item/tool/armor/slime/shell_modifiers/broken/tconstruct_embellishment",
-      "stat_type": "tconstruct:slimesuit"
+      "path": "tconstruct:item/tool/armor/slime/leggings/slime_broken",
+      "stat_type": "tconstruct:slime"
     },
     {
       "allow_animated": false,
-      "path": "tconstruct:item/tool/armor/slime/boot_modifiers/tconstruct_embellishment",
-      "stat_type": "tconstruct:slimesuit"
+      "path": "tconstruct:item/tool/armor/slime/boots/slime",
+      "stat_type": "tconstruct:slime"
     },
     {
       "allow_animated": false,
-      "path": "tconstruct:item/tool/armor/slime/boot_modifiers/broken/tconstruct_embellishment",
-      "stat_type": "tconstruct:slimesuit"
+      "path": "tconstruct:item/tool/armor/slime/boots/slime_broken",
+      "stat_type": "tconstruct:slime"
     },
     {
       "allow_animated": false,
@@ -890,6 +902,18 @@
       "stat_type": "tconstruct:bowstring"
     },
     {
+      "path": "tconstruct:item/tool/fishing_rod/hook",
+      "stat_type": "tconstruct:arrow_head"
+    },
+    {
+      "path": "tconstruct:item/tool/fishing_rod/hook_broken",
+      "stat_type": "tconstruct:arrow_head"
+    },
+    {
+      "path": "tconstruct:item/tool/fishing_rod/hook_cast",
+      "stat_type": "tconstruct:arrow_head"
+    },
+    {
       "path": "tconstruct:item/tool/javelin/head",
       "stat_type": "tconstruct:head"
     },
@@ -938,11 +962,19 @@
       "stat_type": "tconstruct:arrow_shaft"
     },
     {
+      "path": "tconstruct:item/tool/ammo/arrow_feather",
+      "stat_type": "tconstruct:fletching"
+    },
+    {
       "path": "tconstruct:item/tool/ammo/shuriken_top",
       "stat_type": "tconstruct:arrow_head"
     },
     {
       "path": "tconstruct:item/tool/ammo/shuriken_bottom",
+      "stat_type": "tconstruct:arrow_head"
+    },
+    {
+      "path": "tconstruct:item/tool/ammo/axe_head",
       "stat_type": "tconstruct:arrow_head"
     },
     {

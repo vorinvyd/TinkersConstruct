@@ -20,6 +20,8 @@ import net.minecraftforge.network.NetworkHooks;
 import slimeknights.mantle.inventory.EmptyItemHandler;
 import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.common.TinkerTags;
+import slimeknights.tconstruct.common.config.Config;
+import slimeknights.tconstruct.common.config.Config.ToolSyncType;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.modifiers.ModifierHooks;
 import slimeknights.tconstruct.library.module.ModuleHook;
@@ -75,6 +77,16 @@ public class ToolInventoryCapability extends InventoryModifierHookIterator<Modif
     @Override
     public boolean isItemValid(IToolStackView tool, ModifierEntry modifier, int slot, ItemStack stack) {
       return false;
+    }
+
+    @Override
+    public StackMatch findStack(IToolStackView tool, ModifierEntry modifier, Predicate<ItemStack> predicate) {
+      return StackMatch.EMPTY;
+    }
+
+    @Override
+    public List<ItemStack> getAllStacks(IToolStackView tool, ModifierEntry modifier, List<ItemStack> stackList) {
+      return List.of();
     }
   });
 
@@ -534,7 +546,15 @@ public class ToolInventoryCapability extends InventoryModifierHookIterator<Modif
           ToolNameHook.getName(definition, stack, tool)
         ), buf -> {
           buf.writeVarInt(slotIndex);
-          buf.writeItem(stack);
+          ToolSyncType syncType = Config.COMMON.toolInventorySync.get();
+          buf.writeEnum(syncType);
+          if (syncType == ToolSyncType.FULL_STACK) {
+            buf.writeItem(stack);
+          } else if (syncType == ToolSyncType.MINIMAL) {
+            buf.writeVarInt(ModifierUtil.getVolatileInt(stack, TOTAL_SLOTS));
+            buf.writeEnum(CraftingType.fromStack(stack));
+            buf.writeBoolean(ModifierUtil.checkVolatileFlag(stack, INCLUDE_OFFHAND));
+          }
         });
       }
       return InteractionResult.sidedSuccess(player.level().isClientSide);
@@ -564,6 +584,23 @@ public class ToolInventoryCapability extends InventoryModifierHookIterator<Modif
       T element = list.get(index);
       index--;
       return element;
+    }
+  }
+
+
+  /** Crafting table type for the UI */
+  public enum CraftingType {
+    FULL, INVENTORY, NONE;
+
+    /** Gets the crafting type for the given stack */
+    public static CraftingType fromStack(ItemStack stack) {
+      if (ModifierUtil.checkVolatileFlag(stack, CRAFTING_TABLE)) {
+        return FULL;
+      }
+      if (ModifierUtil.checkVolatileFlag(stack, INVENTORY_CRAFTING)) {
+        return INVENTORY;
+      }
+      return NONE;
     }
   }
 }

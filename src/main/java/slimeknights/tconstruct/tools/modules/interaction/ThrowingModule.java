@@ -6,6 +6,7 @@ import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
@@ -27,10 +28,8 @@ import slimeknights.tconstruct.library.tools.capability.PersistentDataCapability
 import slimeknights.tconstruct.library.tools.helper.ModifierUtil;
 import slimeknights.tconstruct.library.tools.item.ranged.ModifiableLauncherItem;
 import slimeknights.tconstruct.library.tools.nbt.IToolStackView;
-import slimeknights.tconstruct.library.tools.nbt.ModDataNBT;
 import slimeknights.tconstruct.library.tools.stat.ToolStats;
 import slimeknights.tconstruct.tools.entity.ThrownTool;
-import slimeknights.tconstruct.tools.modifiers.ability.interaction.BlockingModifier;
 
 import java.util.List;
 
@@ -63,15 +62,19 @@ public enum ThrowingModule implements ModifierModule, GeneralInteractionModifier
 
   @Override
   public UseAnim getUseAction(IToolStackView tool, ModifierEntry modifier) {
-    return BlockingModifier.blockWhileCharging(tool, UseAnim.SPEAR);
+    return ModifierUtil.blockWhileCharging(tool, UseAnim.SPEAR);
   }
 
   @Override
   public InteractionResult onToolUse(IToolStackView tool, ModifierEntry modifier, Player player, InteractionHand hand, InteractionSource source) {
     // can't throw something with no melee stats, will do nothing
-    if (!tool.isBroken() && source == InteractionSource.RIGHT_CLICK && tool.hasTag(TinkerTags.Items.MELEE_WEAPON)) {
+    if (!tool.isBroken() && source == InteractionSource.RIGHT_CLICK) {
+      float speed = ConditionalStatModifierHook.getModifiedStat(tool, player, ToolStats.DRAW_SPEED);
+      if (tool.hasTag(TinkerTags.Items.MELEE_WEAPON)) {
+        speed *= tool.getStats().get(ToolStats.ATTACK_SPEED);
+      }
       // use attack speed together with drawspeed to ensure you are not making insanely slow weapons and throwing to bypass
-      tool.getPersistentData().putInt(KEY_DRAWTIME, (int)Math.ceil(20f / (tool.getStats().get(ToolStats.ATTACK_SPEED) * ConditionalStatModifierHook.getModifiedStat(tool, player, ToolStats.DRAW_SPEED))));
+      tool.getPersistentData().putInt(KEY_DRAWTIME, (int)Math.ceil(20f / speed));
       GeneralInteractionModifierHook.startUsing(tool, modifier.getId(), player, hand);
       return InteractionResult.CONSUME;
     }
@@ -90,16 +93,18 @@ public enum ThrowingModule implements ModifierModule, GeneralInteractionModifier
         float charge = GeneralInteractionModifierHook.getToolCharge(tool, chargeTime);
         float velocity = ConditionalStatModifierHook.getModifiedStat(tool, entity, ToolStats.VELOCITY);
         ThrownTool thrown = new ThrownTool(level, player, stack, charge, velocity, ConditionalStatModifierHook.getModifiedStat(tool, entity, ToolStats.WATER_INERTIA));
+        if (player.getUsedItemHand() == InteractionHand.OFF_HAND) {
+          thrown.setOriginalSlot(Inventory.SLOT_OFFHAND);
+        } else {
+          thrown.setOriginalSlot(player.getInventory().selected);
+        }
         thrown.shootFromRotation(player, player.getXRot(), player.getYRot(), 0, charge * velocity * 2, ModifierUtil.getInaccuracy(tool, entity));
         if (player.getAbilities().instabuild) {
           thrown.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
         }
 
         // alert modifiers we are leaving, though most of these won't have much impact
-        ModDataNBT arrowData = PersistentDataCapability.getOrWarn(thrown);
-        for (ModifierEntry entry : tool.getModifierList()) {
-          entry.getHook(ModifierHooks.PROJECTILE_THROWN).onProjectileShoot(tool, entry, entity, ItemStack.EMPTY, thrown, null, arrowData, true);
-        }
+        thrown.onRelease(entity, PersistentDataCapability.getOrWarn(thrown));
 
         // don't run projectile hooks, as the projectile has the tool already for that. Throwing runs melee hooks
         level.addFreshEntity(thrown);

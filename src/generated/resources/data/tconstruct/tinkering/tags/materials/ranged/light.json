@@ -5,6 +5,7 @@
     "tconstruct:venombone",
     "tconstruct:twisting_vine",
     "tconstruct:nahuatl",
+    "tconstruct:rose_gold",
     "tconstruct:hepatizon",
     "tconstruct:queens_slime",
     "tconstruct:knightmetal",
@@ -22,6 +23,10 @@
     },
     {
       "id": "tconstruct:plated_slimewood",
+      "required": false
+    },
+    {
+      "id": "tconstruct:nicrosil",
       "required": false
     }
   ]

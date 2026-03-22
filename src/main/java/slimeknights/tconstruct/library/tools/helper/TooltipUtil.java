@@ -20,6 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStack.TooltipPart;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.ToolActions;
 import slimeknights.mantle.client.SafeClientAccess;
 import slimeknights.mantle.client.TooltipKey;
 import slimeknights.tconstruct.TConstruct;
@@ -31,7 +32,9 @@ import slimeknights.tconstruct.library.materials.definition.MaterialVariantId;
 import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.modifiers.ModifierHooks;
+import slimeknights.tconstruct.library.modifiers.hook.interaction.EntityInteractionModifierHook;
 import slimeknights.tconstruct.library.tools.definition.ToolDefinition;
+import slimeknights.tconstruct.library.tools.definition.module.ToolHooks;
 import slimeknights.tconstruct.library.tools.definition.module.display.ToolNameHook;
 import slimeknights.tconstruct.library.tools.definition.module.material.ToolMaterialHook;
 import slimeknights.tconstruct.library.tools.definition.module.material.ToolPartsHook;
@@ -44,7 +47,6 @@ import slimeknights.tconstruct.library.tools.nbt.ToolStack;
 import slimeknights.tconstruct.library.tools.part.IToolPart;
 import slimeknights.tconstruct.library.tools.stat.ToolStats;
 import slimeknights.tconstruct.library.utils.Util;
-import slimeknights.tconstruct.tools.TinkerModifiers;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -261,7 +263,8 @@ public class TooltipUtil {
     if (tool.hasTag(TinkerTags.Items.DURABILITY)) {
       builder.addDurability();
     }
-    boolean meleePrimary = tool.hasTag(TinkerTags.Items.MELEE_PRIMARY);
+    boolean allowMelee = !EntityInteractionModifierHook.meleeDisabled(tool);
+    boolean meleePrimary = allowMelee && tool.hasTag(TinkerTags.Items.MELEE_PRIMARY);
     if (meleePrimary) {
       builder.addWithAttribute(ToolStats.ATTACK_DAMAGE, Attributes.ATTACK_DAMAGE);
       builder.add(ToolStats.ATTACK_SPEED);
@@ -274,7 +277,7 @@ public class TooltipUtil {
       }
       builder.add(ToolStats.ACCURACY);
     }
-    if (!meleePrimary && tool.hasTag(TinkerTags.Items.MELEE_WEAPON)) {
+    if (allowMelee && !meleePrimary && tool.hasTag(TinkerTags.Items.MELEE_WEAPON)) {
       builder.addWithAttribute(ToolStats.ATTACK_DAMAGE, Attributes.ATTACK_DAMAGE);
       builder.add(ToolStats.ATTACK_SPEED);
     }
@@ -290,8 +293,7 @@ public class TooltipUtil {
       builder.addOptional(ToolStats.ARMOR_TOUGHNESS);
       builder.addOptional(ToolStats.KNOCKBACK_RESISTANCE, 10f);
     }
-    // TODO: should this be a tag? or a volatile flag?
-    if (tool.getModifierLevel(TinkerModifiers.blocking.getId()) > 0 || tool.getModifierLevel(TinkerModifiers.parrying.getId()) > 0) {
+    if (ModifierUtil.canPerformAction(tool, ToolActions.SHIELD_BLOCK)) {
       builder.add(ToolStats.BLOCK_AMOUNT);
       builder.add(ToolStats.BLOCK_ANGLE);
     }
@@ -344,6 +346,7 @@ public class TooltipUtil {
   public static List<Component> getAmmoStats(IToolStackView tool, @Nullable Player player, List<Component> tooltip, TooltipKey key, TooltipFlag flag) {
     TooltipBuilder builder = new TooltipBuilder(tool, tooltip);
     builder.add(ToolStats.PROJECTILE_DAMAGE);
+    builder.add(ToolStats.VELOCITY);
     builder.add(ToolStats.ACCURACY);
     builder.addAllFreeSlots();
     for (ModifierEntry entry : tool.getModifierList()) {
@@ -362,13 +365,15 @@ public class TooltipUtil {
    */
   public static void getComponents(IModifiable item, ItemStack stack, List<Component> tooltips, TooltipFlag flag) {
     // no components, nothing to do
-    List<MaterialStatsId> components = ToolMaterialHook.stats(item.getToolDefinition());
+    ToolDefinition definition = item.getToolDefinition();
+    ToolMaterialHook hook = definition.getHook(ToolHooks.TOOL_MATERIALS);
+    List<MaterialStatsId> components = hook.getStatTypes(definition);
     if (components.isEmpty()) {
       return;
     }
     // no materials is bad
     MaterialNBT materials = ToolStack.from(stack).getMaterials();
-    if (materials.size() == 0) {
+    if (materials.isEmpty()) {
       tooltips.add(NO_DATA);
       return;
     }
@@ -396,7 +401,8 @@ public class TooltipUtil {
         tooltips.add((Component.literal(material.toString())).withStyle(ChatFormatting.DARK_GRAY));
       }
       // material stats
-      MaterialRegistry.getInstance().getMaterialStats(material.getId(), components.get(i)).ifPresent(stat -> tooltips.addAll(stat.getLocalizedInfo()));
+      float scale = hook.scaleStats(definition, i);
+      MaterialRegistry.getInstance().getMaterialStats(material.getId(), components.get(i)).ifPresent(stat -> tooltips.addAll(stat.getLocalizedInfo(scale)));
       if (i != max) {
         tooltips.add(Component.empty());
       }

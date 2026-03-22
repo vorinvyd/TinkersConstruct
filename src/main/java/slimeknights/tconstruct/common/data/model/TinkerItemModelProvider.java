@@ -16,6 +16,7 @@ import slimeknights.tconstruct.common.registration.CastItemObject;
 import slimeknights.tconstruct.library.tools.part.MaterialItem;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 import slimeknights.tconstruct.tools.TinkerToolParts;
+import slimeknights.tconstruct.world.TinkerWorld;
 
 import static slimeknights.tconstruct.TConstruct.getResource;
 
@@ -46,13 +47,15 @@ public class TinkerItemModelProvider extends ItemModelProvider {
     part(TinkerToolParts.bowGrip, "crossbow/body").offset(-2, -2);
     part(TinkerToolParts.bowstring);
     part(TinkerToolParts.arrowHead, "ammo/arrow_head").offset(-4, 3);
-    part(TinkerToolParts.arrowShaft, "ammo/arrow_shaft");
+    part(TinkerToolParts.arrowShaft, "ammo/arrow_shaft").offset(1, -1);;
+    part(TinkerToolParts.fletching, "ammo/arrow_feather").offset(4, -5);;
     // other
     part(TinkerToolParts.toolBinding);
     part(TinkerToolParts.toolHandle);
     part(TinkerToolParts.toughHandle);
     part(TinkerToolParts.toughBinding);
     part(TinkerToolParts.repairKit);
+    part(TinkerToolParts.fakeIngot, "parts/ingot");
     // armor
     TinkerToolParts.plating.forEach((slot, item) -> {
       MaterialModelBuilder<ItemModelBuilder> b = this.part(item, "armor/plate/" + slot.getName() + "/plating");
@@ -111,6 +114,17 @@ public class TinkerItemModelProvider extends ItemModelProvider {
     cast(TinkerSmeltery.mailleCast);
     // dummy parts
     TinkerSmeltery.dummyPlating.forEach((type, item) -> basicItem(item, "tool/parts/plating_" + type.getName()));
+
+    // world //
+    // shards
+    basicItem(TinkerWorld.steelShard, "materials/steel_shard");
+    basicItem(TinkerWorld.cobaltShard, "materials/cobalt_shard");
+    basicItem(TinkerWorld.knightmetalShard, "materials/knightmetal_shard");
+    generated(TinkerWorld.steelCluster, "block/geode/steel_cluster");
+    generated(TinkerWorld.cobaltCluster, "block/geode/cobalt_cluster");
+    generated(TinkerWorld.knightmetalCluster, "block/geode/knightmetal_cluster");
+    // heads
+    TinkerWorld.headItems.forEach(head -> withExistingParent(id(head).getPath(), "item/template_skull"));
   }
 
   @SuppressWarnings("deprecation") // no its not
@@ -124,6 +138,7 @@ public class TinkerItemModelProvider extends ItemModelProvider {
   }
 
   /** Generated item with a texture */
+  @SuppressWarnings("removal")
   private ItemModelBuilder generated(ResourceLocation item, String texture) {
     return generated(item, new ResourceLocation(item.getNamespace(), texture));
   }

@@ -25,6 +25,7 @@ import slimeknights.tconstruct.tools.stats.HandleMaterialStats;
 import slimeknights.tconstruct.tools.stats.HeadMaterialStats;
 import slimeknights.tconstruct.tools.stats.LimbMaterialStats;
 import slimeknights.tconstruct.tools.stats.PlatingMaterialStats;
+import slimeknights.tconstruct.tools.stats.SlimeStats;
 import slimeknights.tconstruct.tools.stats.StatlessMaterialStats;
 
 import javax.annotation.Nullable;
@@ -241,22 +242,33 @@ public abstract class AbstractMaterialSpriteProvider {
       return this;
     }
 
+    /** Adds slime textures for the given material. */
+    public MaterialSpriteInfoBuilder slime() {
+      return statType(SlimeStats.ID, TinkerPartSpriteProvider.SLIMESUIT);
+    }
+
     /** Makes this work as the wood part for a shield */
     public MaterialSpriteInfoBuilder shieldCore() {
-      statType(StatlessMaterialStats.SHIELD_CORE.getIdentifier());
+      statType(StatlessMaterialStats.SHIELD_CORE);
       repairKit(); // used by traveler's shields
       return this;
     }
 
     /** Makes this work as the head for an arrow or shuriken */
     public MaterialSpriteInfoBuilder arrowHead() {
-      statType(StatlessMaterialStats.ARROW_HEAD.getIdentifier());
+      statType(StatlessMaterialStats.ARROW_HEAD);
       return this;
     }
 
     /** Makes this work as the shaft for an arrow */
     public MaterialSpriteInfoBuilder arrowShaft() {
-      statType(StatlessMaterialStats.ARROW_SHAFT.getIdentifier());
+      statType(StatlessMaterialStats.ARROW_SHAFT);
+      return this;
+    }
+
+    /** Makes this work as the shaft for an arrow */
+    public MaterialSpriteInfoBuilder fletching() {
+      statType(StatlessMaterialStats.FLETCHING);
       return this;
     }
 

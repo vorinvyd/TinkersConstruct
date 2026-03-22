@@ -197,6 +197,7 @@ public class ToolStack implements IToolStackView {
    * Creates a new tool stack for a completely new tool
    * @param item        Item
    * @param definition  Tool definition
+   * @param materials  Materials list
    * @return  Tool stack
    */
   public static ToolStack createTool(Item item, ToolDefinition definition, MaterialNBT materials) {
@@ -321,7 +322,15 @@ public class ToolStack implements IToolStackView {
     return restrictedNBT;
   }
 
-  /* Damaging */
+  @Override
+  public boolean isSameStack(ItemStack stack) {
+    // tool stacks share NBT with their stack instance unless copied so changes are mirrored
+    // item check allows empty as empty stacks change their item to air. This won't false positive with ItemStack#EMPTY as the NBT won't match.
+    return nbt == stack.getTag() && (stack.isEmpty() || stack.getItem() == item);
+  }
+
+
+  /* Durability */
 
   /**
    * Checks if this tool is currently broken
@@ -664,8 +673,15 @@ public class ToolStack implements IToolStackView {
     }
     // next, ensure modifiers validate
     Component result;
-    for (ModifierEntry entry : getModifierList()) {
+    for (ModifierEntry entry : getModifiers()) {
       result = entry.getHook(ModifierHooks.VALIDATE).validate(this, entry);
+      if (result != null) {
+        return result;
+      }
+    }
+    // some validations should only run if the modifier was crafted on the tool
+    for (ModifierEntry entry : getUpgrades()) {
+      result = entry.getHook(ModifierHooks.VALIDATE_UPGRADE).validate(this, entry);
       if (result != null) {
         return result;
       }

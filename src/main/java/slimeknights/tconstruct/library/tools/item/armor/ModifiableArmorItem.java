@@ -16,6 +16,7 @@ import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
@@ -69,6 +70,8 @@ public class ModifiableArmorItem extends ArmorItem implements IModifiableDisplay
   public static final ResourceLocation ELYTRA = TConstruct.getResource("elyta");
   /** Volatile flag for a boot item to walk on powdered snow. Cold immunity is handled through a tag */
   public static final ResourceLocation SNOW_BOOTS = TConstruct.getResource("snow_boots");
+  /** Volatile flag for an item to act as an enderman mask, stopping them from getting angry. */
+  public static final ResourceLocation ENDERMASK = TConstruct.getResource("endermask");
 
   @Getter
   private final ToolDefinition toolDefinition;
@@ -98,6 +101,11 @@ public class ModifiableArmorItem extends ArmorItem implements IModifiableDisplay
   @Override
   public boolean canWalkOnPowderedSnow(ItemStack stack, LivingEntity wearer) {
     return type == Type.BOOTS && ModifierUtil.checkVolatileFlag(stack, SNOW_BOOTS);
+  }
+
+  @Override
+  public boolean isEnderMask(ItemStack stack, Player player, EnderMan endermanEntity) {
+    return type == Type.HELMET && ModifierUtil.checkVolatileFlag(stack, ENDERMASK);
   }
 
   @Override
@@ -281,10 +289,16 @@ public class ModifiableArmorItem extends ArmorItem implements IModifiableDisplay
       // base stats
       StatsNBT statsNBT = tool.getStats();
       UUID uuid = ARMOR_MODIFIER_UUID_PER_TYPE.get(type);
-      builder.put(Attributes.ARMOR, new AttributeModifier(uuid, "tconstruct.armor.armor", statsNBT.get(ToolStats.ARMOR), AttributeModifier.Operation.ADDITION));
-      builder.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(uuid, "tconstruct.armor.toughness", statsNBT.get(ToolStats.ARMOR_TOUGHNESS), AttributeModifier.Operation.ADDITION));
+      float armor = statsNBT.get(ToolStats.ARMOR);
+      if (armor > 0) {
+        builder.put(Attributes.ARMOR, new AttributeModifier(uuid, "tconstruct.armor.armor", armor, AttributeModifier.Operation.ADDITION));
+      }
+      float toughness = statsNBT.get(ToolStats.ARMOR_TOUGHNESS);
+      if (toughness > 0) {
+        builder.put(Attributes.ARMOR_TOUGHNESS, new AttributeModifier(uuid, "tconstruct.armor.toughness", toughness, AttributeModifier.Operation.ADDITION));
+      }
       double knockbackResistance = statsNBT.get(ToolStats.KNOCKBACK_RESISTANCE);
-      if (knockbackResistance != 0) {
+      if (knockbackResistance > 0) {
         builder.put(Attributes.KNOCKBACK_RESISTANCE, new AttributeModifier(uuid, "tconstruct.armor.knockback_resistance", knockbackResistance, AttributeModifier.Operation.ADDITION));
       }
       // grab attributes from modifiers
@@ -340,17 +354,14 @@ public class ModifiableArmorItem extends ArmorItem implements IModifiableDisplay
 
   @Override
   public void inventoryTick(ItemStack stack, Level levelIn, Entity entityIn, int itemSlot, boolean isSelected) {
-    super.inventoryTick(stack, levelIn, entityIn, itemSlot, isSelected);
-
     // don't care about non-living, they skip most tool context
-    if (entityIn instanceof LivingEntity) {
+    if (entityIn instanceof LivingEntity living) {
       ToolStack tool = ToolStack.from(stack);
       if (!levelIn.isClientSide) {
         tool.ensureHasData();
       }
       List<ModifierEntry> modifiers = tool.getModifierList();
       if (!modifiers.isEmpty()) {
-        LivingEntity living = (LivingEntity) entityIn;
         boolean isCorrectSlot = living.getItemBySlot(getEquipmentSlot()) == stack;
         // we pass in the stack for most custom context, but for the sake of armor its easier to tell them that this is the correct slot for effects
         for (ModifierEntry entry : modifiers) {
@@ -362,12 +373,12 @@ public class ModifiableArmorItem extends ArmorItem implements IModifiableDisplay
 
   @Override
   public boolean overrideStackedOnOther(ItemStack held, Slot slot, ClickAction action, Player player) {
-    return SlotStackModifierHook.overrideStackedOnOther(held, slot, action, player);
+    return SlotStackModifierHook.overrideStackedOnOther(held, slot, action, player) || super.overrideStackedOnOther(held, slot, action, player);
   }
 
   @Override
   public boolean overrideOtherStackedOnMe(ItemStack slotStack, ItemStack held, Slot slot, ClickAction action, Player player, SlotAccess access) {
-    return SlotStackModifierHook.overrideOtherStackedOnMe(slotStack, held, slot, action, player, access);
+    return SlotStackModifierHook.overrideOtherStackedOnMe(slotStack, held, slot, action, player, access) || super.overrideOtherStackedOnMe(slotStack, held, slot, action, player, access);
   }
 
 

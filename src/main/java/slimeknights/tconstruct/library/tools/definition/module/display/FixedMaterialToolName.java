@@ -4,7 +4,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import slimeknights.mantle.data.loadable.primitive.IntLoadable;
 import slimeknights.mantle.data.loadable.record.RecordLoadable;
-import slimeknights.mantle.data.registry.GenericLoaderRegistry.IHaveLoader;
 import slimeknights.tconstruct.library.materials.definition.IMaterial;
 import slimeknights.tconstruct.library.materials.definition.MaterialVariantId;
 import slimeknights.tconstruct.library.module.HookProvider;
@@ -18,7 +17,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 /** Tool name that always shows the same material */
-public record FixedMaterialToolName(int index) implements ToolNameHook, ToolModule {
+public record FixedMaterialToolName(int index) implements ToolNameHook.FromDefault, ToolModule {
   private static final List<ModuleHook<?>> DEFAULT_HOOKS = HookProvider.<FixedMaterialToolName>defaultHooks(ToolHooks.DISPLAY_NAME);
   /** Instance for an index of 0 */
   public static final FixedMaterialToolName FIRST = new FixedMaterialToolName(0);
@@ -40,13 +39,12 @@ public record FixedMaterialToolName(int index) implements ToolNameHook, ToolModu
   }
 
   @Override
-  public RecordLoadable<? extends IHaveLoader> getLoader() {
+  public RecordLoadable<FixedMaterialToolName> getLoader() {
     return LOADER;
   }
 
   @Override
-  public Component getDisplayName(ToolDefinition definition, ItemStack stack, @Nullable IToolStackView tool) {
-    Component itemName = Component.translatable(stack.getItem().getDescriptionId());
+  public Component getDisplayName(ToolDefinition definition, ItemStack stack, @Nullable IToolStackView tool, Component itemName) {
     MaterialVariantId material = ToolNameHook.getTool(stack, tool).getMaterials().get(index).getVariant();
     if (IMaterial.UNKNOWN_ID.equals(material)) {
       return itemName;

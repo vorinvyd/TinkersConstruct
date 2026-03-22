@@ -6,8 +6,9 @@
     "tconstruct:multishot",
     "tconstruct:ballista",
     "tconstruct:grapple",
-    "tconstruct:collecting",
     "tconstruct:channeling",
-    "tconstruct:returning"
+    "tconstruct:returning",
+    "tconstruct:slimeball",
+    "tconstruct:sliver"
   ]
 }

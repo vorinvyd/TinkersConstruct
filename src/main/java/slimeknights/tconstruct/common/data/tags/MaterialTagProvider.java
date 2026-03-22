@@ -14,23 +14,65 @@ public class MaterialTagProvider extends AbstractMaterialTagProvider {
 
   @Override
   protected void addTags() {
-    // fiery is obtained through specific progression in TF, better to not add a progression bypass
-    tag(TinkerTags.Materials.EXCLUDE_FROM_LOOT).addOptional(MaterialIds.fiery);
+    tag(TinkerTags.Materials.EXCLUDE_FROM_LOOT)
+      // ancient hide is deprecated, don't add it to new tools
+      .add(MaterialIds.ancientHide)
+      // fiery is obtained through specific progression in TF, better to not add a progression bypass
+      .addOptional(MaterialIds.fiery);
     tag(TinkerTags.Materials.NETHER).add(
       // tier 1
       MaterialIds.wood, MaterialIds.flint, MaterialIds.rock, MaterialIds.bone,
-      MaterialIds.leather, MaterialIds.vine, MaterialIds.string,
+      MaterialIds.leather, MaterialIds.string,
       // tier 2
-      MaterialIds.gold,
-      MaterialIds.scorchedStone, MaterialIds.slimewood, MaterialIds.necroticBone,
+      MaterialIds.gold, MaterialIds.slimewood,
       // tier 3
-      MaterialIds.nahuatl, MaterialIds.obsidian, MaterialIds.darkthread,
-      MaterialIds.cobalt, MaterialIds.steel,
+      MaterialIds.nahuatl, MaterialIds.obsidian, MaterialIds.darkthread, MaterialIds.steel,
       // tier 4
-      MaterialIds.manyullyn, MaterialIds.cinderslime,
+      MaterialIds.ancient
+    ).addTag(TinkerTags.Materials.NETHER_GATED);
+
+    // things that *require* nether access to craft
+    tag(TinkerTags.Materials.NETHER_GATED).add(
+      // tier 1
+      MaterialIds.twistingVine, MaterialIds.weepingVine,
+      // tier 2
+      MaterialIds.scorchedStone, MaterialIds.necroticBone,
+      // tier 3
+      MaterialIds.cobalt,
+      // tier 4
+      MaterialIds.manyullyn, MaterialIds.hepatizon, MaterialIds.cinderslime,
       MaterialIds.queensSlime, MaterialIds.blazingBone, MaterialIds.blazewood,
-      MaterialIds.ancientHide, MaterialIds.ancient
+      MaterialIds.jeweledHide,
+      // ammo
+      MaterialIds.glowstone, MaterialIds.ichor, MaterialIds.quartz, MaterialIds.blaze, MaterialIds.magma
+    ).addOptional(MaterialIds.necronium);
+
+    // all materials to show in materials and you for ammo, kept to 9 options
+    tag(TinkerTags.Materials.BASIC_AMMO).add(
+      // head
+      MaterialIds.flint, MaterialIds.wool, MaterialIds.glass,
+      // shaft
+      MaterialIds.wood, MaterialIds.bamboo, MaterialIds.cactus,
+      // fletching
+      MaterialIds.feather, MaterialIds.paper, MaterialIds.leaves
     );
+
+    // tier 4 is split into several parts in different books
+    tag(TinkerTags.Materials.BLAZING_BLOOD).add(
+      MaterialIds.manyullyn, MaterialIds.hepatizon,
+        MaterialIds.queensSlime, MaterialIds.cinderslime,
+        MaterialIds.blazingBone, MaterialIds.blazewood,
+        MaterialIds.jeweledHide
+      ).addOptional(MaterialIds.nicrosil);
+    tag(TinkerTags.Materials.DISTANT).add(
+      // tiers 1-2
+      MaterialIds.chorus, MaterialIds.whitestone,
+      // tier 4
+      MaterialIds.knightmetal, MaterialIds.knightly, MaterialIds.knightslime, MaterialIds.enderslimeVine, MaterialIds.ancient,
+      // ammo and maille
+      MaterialIds.shulker, MaterialIds.dragonScale, MaterialIds.enderslime, MaterialIds.endRod
+    ).addOptional(MaterialIds.ironwood, MaterialIds.steeleaf, MaterialIds.fiery);
+
     // materials bartered by piglins
     tag(TinkerTags.Materials.BARTERED).add(
       // tier 3
@@ -40,8 +82,21 @@ public class MaterialTagProvider extends AbstractMaterialTagProvider {
       MaterialIds.manyullyn, MaterialIds.hepatizon,
       MaterialIds.cinderslime, MaterialIds.queensSlime,
       MaterialIds.blazingBone, MaterialIds.blazewood,
-      MaterialIds.ancientHide, MaterialIds.ancient
+      MaterialIds.jeweledHide, MaterialIds.ancient
     ).addOptional(MaterialIds.necronium);
+
+    // tag all compat materials
+    tag(TinkerTags.Materials.COMPATABILITY_METALS).addOptional(
+      // tier 2
+      MaterialIds.silver, MaterialIds.lead, MaterialIds.aluminum,
+      MaterialIds.osmium, MaterialIds.ironwood,
+      // tier 3
+      MaterialIds.steeleaf,
+      // tier 4
+      MaterialIds.fiery
+    ).addTag(TinkerTags.Materials.COMPATABILITY_BLOCKS);
+    tag(TinkerTags.Materials.COMPATABILITY_BLOCKS).addTag(TinkerTags.Materials.COMPATABILITY_ALLOYS);
+    tag(TinkerTags.Materials.COMPATABILITY_ALLOYS).addOptional(MaterialIds.bronze, MaterialIds.constantan, MaterialIds.invar, MaterialIds.electrum, MaterialIds.pewter, MaterialIds.nicrosil);
 
     // material categories
     // melee harvest
@@ -72,7 +127,7 @@ public class MaterialTagProvider extends AbstractMaterialTagProvider {
       // tier 3
       MaterialIds.amethystBronze,
       // tier 4
-      MaterialIds.hepatizon, MaterialIds.ancientHide
+      MaterialIds.hepatizon, MaterialIds.jeweledHide, MaterialIds.knightslime
     ).addOptional(
       // tier 2
       MaterialIds.lead,
@@ -92,7 +147,9 @@ public class MaterialTagProvider extends AbstractMaterialTagProvider {
       // tier 2
       MaterialIds.silver,
       // tier 3
-      MaterialIds.invar, MaterialIds.pewter, MaterialIds.necronium
+      MaterialIds.invar, MaterialIds.pewter, MaterialIds.necronium,
+      // tier 4
+      MaterialIds.nicrosil
     );
 
     // ranged
@@ -103,9 +160,9 @@ public class MaterialTagProvider extends AbstractMaterialTagProvider {
       // tier 2
       MaterialIds.slimewood, MaterialIds.necroticBone, MaterialIds.skyslimeVine,
       // tier 3
-      MaterialIds.slimesteel, MaterialIds.roseGold, MaterialIds.darkthread, MaterialIds.cobalt,
+      MaterialIds.slimesteel, MaterialIds.darkthread, MaterialIds.cobalt, MaterialIds.pigIron,
       // tier 4
-      MaterialIds.blazingBone, MaterialIds.ancientHide, MaterialIds.enderslimeVine
+      MaterialIds.blazingBone, MaterialIds.jeweledHide, MaterialIds.enderslimeVine
     ).addOptional(
       // tier 1
       MaterialIds.treatedWood,
@@ -120,24 +177,26 @@ public class MaterialTagProvider extends AbstractMaterialTagProvider {
       // tier 2
       MaterialIds.venombone, MaterialIds.twistingVine,
       // tier 3
-      MaterialIds.nahuatl,
+      MaterialIds.nahuatl, MaterialIds.roseGold,
       // tier 4
       MaterialIds.hepatizon, MaterialIds.queensSlime, MaterialIds.knightmetal
     ).addOptional(
       // tier 2
       MaterialIds.aluminum,
       // tier 3
-      MaterialIds.necronium, MaterialIds.constantan, MaterialIds.platedSlimewood
+      MaterialIds.necronium, MaterialIds.constantan, MaterialIds.platedSlimewood,
+      // tier 4
+      MaterialIds.nicrosil
     );
     tag(TinkerTags.Materials.HEAVY).add(
       // tier 1
-      MaterialIds.copper,
+      MaterialIds.copper, MaterialIds.cactus,
       // tier 2
       MaterialIds.iron, MaterialIds.weepingVine,
       // tier 3
       MaterialIds.amethystBronze, MaterialIds.steel,
       // tier 4
-      MaterialIds.manyullyn, MaterialIds.cinderslime
+      MaterialIds.manyullyn, MaterialIds.cinderslime, MaterialIds.knightslime
     ).addOptional(
       // tier 2
       MaterialIds.lead,
@@ -146,6 +205,24 @@ public class MaterialTagProvider extends AbstractMaterialTagProvider {
       // tier 4
       MaterialIds.fiery
     );
+
+    // slimeskull sort order
+    tag(TinkerTags.Materials.SLIMESKULL).add(
+      // creeper
+      MaterialIds.glass,
+      // zombie
+      MaterialIds.leather, MaterialIds.iron, MaterialIds.copper,
+      // spider
+      MaterialIds.string, MaterialIds.darkthread,
+      // skeleton
+      MaterialIds.bone, MaterialIds.ice, MaterialIds.necroticBone,
+      // piglins
+      MaterialIds.gold, MaterialIds.roseGold, MaterialIds.pigIron,
+      // misc
+      MaterialIds.blaze, MaterialIds.enderPearl, MaterialIds.dragonScale,
+      // crafted
+      MaterialIds.venombone, MaterialIds.blazingBone, MaterialIds.knightmetal
+    ).addOptional(MaterialIds.necronium);
   }
 
   @Override

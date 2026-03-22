@@ -10,6 +10,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ArrowItem;
@@ -38,7 +39,6 @@ import slimeknights.tconstruct.library.tools.nbt.ModifierNBT;
 import slimeknights.tconstruct.library.tools.nbt.ToolStack;
 import slimeknights.tconstruct.library.tools.stat.ToolStats;
 import slimeknights.tconstruct.tools.entity.ThrownTool;
-import slimeknights.tconstruct.tools.modifiers.ability.interaction.BlockingModifier;
 
 import java.util.function.Predicate;
 
@@ -89,7 +89,7 @@ public class ModifiableBowItem extends ModifiableLauncherItem {
 
   @Override
   public UseAnim getUseAnimation(ItemStack stack) {
-    return BlockingModifier.blockWhileCharging(ToolStack.from(stack), UseAnim.BOW);
+    return ModifierUtil.blockWhileCharging(ToolStack.from(stack), UseAnim.BOW);
   }
 
 
@@ -127,7 +127,7 @@ public class ModifiableBowItem extends ModifiableLauncherItem {
       }
       return InteractionResultHolder.fail(bow);
     }
-    GeneralInteractionModifierHook.startDrawtime(tool, player, 1);
+    GeneralInteractionModifierHook.startDrawing(tool, player, 1);
     // store either ammo or boolean as requested
     if (!ammo.isEmpty()) {
       if (storeDrawingItem) {
@@ -179,7 +179,8 @@ public class ModifiableBowItem extends ModifiableLauncherItem {
       case FLAG_NO_BALLISTA -> getSupportedHeldProjectiles();
       default -> isBallista(tool) ? getSupportedBallistaAmmo() : getSupportedHeldProjectiles();
     };
-    boolean hasAmmo = creative || !BowAmmoModifierHook.getAmmo(tool, bow, living, ammoPredicate).isEmpty();
+    ItemStack foundAmmo = BowAmmoModifierHook.getAmmo(tool, bow, living, ammoPredicate);
+    boolean hasAmmo = !foundAmmo.isEmpty() || creative && !tool.getVolatileData().getBoolean(BowAmmoModifierHook.SKIP_INVENTORY_AMMO);
 
     // ask forge its thoughts on shooting
     int chargeTime = duration - timeLeft;
@@ -202,8 +203,29 @@ public class ModifiableBowItem extends ModifiableLauncherItem {
 
     // launch the arrow
     if (!level.isClientSide) {
+      int originalSlot = -1;
+      int desiredProjectiles = 1;
+      // if it's a ballista shot, locate the original slot so we can store it on the entity
+      if (foundAmmo.is(TinkerTags.Items.BALLISTA_AMMO)) {
+        if (player != null) {
+          if (foundAmmo == living.getOffhandItem()) {
+            originalSlot = Inventory.SLOT_OFFHAND;
+          } else {
+            Inventory inventory = player.getInventory();
+            for (int i = 0; i < Inventory.INVENTORY_SIZE; i++) {
+              if (inventory.getItem(i) == foundAmmo) {
+                originalSlot = i;
+                break;
+              }
+            }
+          }
+        }
+      } else {
+        // TODO: remove multishot logic? or keep it around for addons?
+        desiredProjectiles = BowAmmoModifierHook.getDesiredProjectiles(tool);
+      }
       // filter ammo based on request from current ballista settings
-      ItemStack ammo = BowAmmoModifierHook.consumeAmmo(tool, bow, living, player, ammoPredicate);
+      ItemStack ammo = BowAmmoModifierHook.consumeAmmo(tool, bow, living, player, ammoPredicate, desiredProjectiles);
       // could only be empty at this point if we are creative, as hasAmmo returned true above
       if (ammo.isEmpty()) {
         ammo = new ItemStack(Items.ARROW);
@@ -218,7 +240,12 @@ public class ModifiableBowItem extends ModifiableLauncherItem {
       if (thrownTool) {
         sound = SoundEvents.TRIDENT_THROW;
         IToolStackView thrown = ToolStack.from(ammo);
-        power *= thrown.getStats().get(ToolStats.ATTACK_SPEED) / 1.5f;
+        float thrownVelocity = ConditionalStatModifierHook.getModifiedStat(thrown, living, ToolStats.VELOCITY);
+        power *= thrownVelocity * ConditionalStatModifierHook.getModifiedStat(thrown, living, ToolStats.DRAW_SPEED) / 1.5f;
+        if (ammo.is(TinkerTags.Items.MELEE_WEAPON)) {
+          power *= thrown.getStats().get(ToolStats.ATTACK_SPEED);
+        }
+        velocity *= thrownVelocity;
         waterInertia = ConditionalStatModifierHook.getModifiedStat(thrown, living, ToolStats.WATER_INERTIA);
       }
       float inaccuracy = ModifierUtil.getInaccuracy(tool, living);
@@ -227,7 +254,9 @@ public class ModifiableBowItem extends ModifiableLauncherItem {
       for (int arrowIndex = 0; arrowIndex < ammo.getCount(); arrowIndex++) {
         AbstractArrow arrow;
         if (thrownTool) {
-          arrow = new ThrownTool(level, living, ammo, charge, velocity, waterInertia);
+          ThrownTool thrown = new ThrownTool(level, living, ammo, charge, velocity, waterInertia);
+          thrown.setOriginalSlot(originalSlot);
+          arrow = thrown;
         } else {
           arrow = arrowItem.createArrow(level, ammo, living);
         }
@@ -258,6 +287,13 @@ public class ModifiableBowItem extends ModifiableLauncherItem {
         for (ModifierEntry entry : modifiers.getModifiers()) {
           entry.getHook(ModifierHooks.PROJECTILE_LAUNCH).onProjectileLaunch(tool, entry, living, ammo, arrow, arrow, arrowData, arrowIndex == primaryIndex);
         }
+
+        // allow ballista to run a few remaining hooks if present
+        if (thrownTool) {
+          // know the cast is valid as we created the instance above
+          ((ThrownTool) arrow).onRelease(living, arrowData);
+        }
+
         level.addFreshEntity(arrow);
         level.playSound(null, living.getX(), living.getY(), living.getZ(), sound, SoundSource.PLAYERS, 1.0F, 1.0F / (level.getRandom().nextFloat() * 0.4F + 1.2F) + charge * 0.5F + (angle / 10f));
       }

@@ -22,6 +22,8 @@ public class TinkerDamageTypes {
   public static final ResourceKey<DamageType> SMELTERY_MAGIC = create("smeltery_magic");
   /** Damage from a knightmetal block */
   public static final ResourceKey<DamageType> KNIGHTMETAL = create("knightmetal");
+  /** Damage dealt when updating health decreases you below max health */
+  public static final ResourceKey<DamageType> UPDATE_HEALTH = create("update_health");
 
   /** Damage from throwing a tool */
   public static final ResourceKey<DamageType> THROWN_TOOL = create("thrown_tool");
@@ -35,13 +37,22 @@ public class TinkerDamageTypes {
   public static final ResourceKey<DamageType> BLEEDING = create("bleeding");
   /** Damage source entangled modifier from twisted vines */
   public static final ResourceKey<DamageType> ENTANGLED = create("entangled");
+  /** Damage source spiny modifier from cactus */
+  public static final ResourceKey<DamageType> SPINY = create("spiny");
   /** Damage source for shock modifier */
   public static final ResourceKey<DamageType> SHOCK = create("shock");
   /** Damage source for the self-destructing modifier */
   public static final ResourceKey<DamageType> SELF_DESTRUCT = create("self_destruct");
 
-  /** Damage source for a non-projectile with arrow death messages */
+  /** Damage source for a non-projectile with {@link net.minecraft.world.damagesource.DamageTypes#ARROW}. Used in enderference. */
   public static final ResourceKey<DamageType> MELEE_ARROW = create("melee_arrow");
+  /** Damage source for a non-projectile with {@link net.minecraft.world.damagesource.DamageTypes#THROWN} death messages. Used in enderference. */
+  public static final ResourceKey<DamageType> MELEE_THROWN = create("melee_thrown");
+  /** Damage source for a "non-projectile" with {@link #THROWN_TOOL}. Used in enderference. */
+  public static final ResourceKey<DamageType> MELEE_THROWN_TOOL = create("melee_thrown_tool");
+  /** Damage source for a "non-projectile" with {@link #FISHING_HOOK}. Used in enderference. */
+  public static final ResourceKey<DamageType> MELEE_FISHING_HOOK = create("melee_fishing_hook");
+
   /** Damage source for an explosion that does not scale with difficulty */
   public static final DamageTypePair EXPLOSION = createPair("explosion");
   /** Damage source for an entity caused explosion that does not scale with difficulty */

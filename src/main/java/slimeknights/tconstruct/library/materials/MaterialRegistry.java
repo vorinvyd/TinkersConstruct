@@ -7,6 +7,7 @@ import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.OnDatapackSyncEvent;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.PacketDistributor.PacketTarget;
+import org.jetbrains.annotations.ApiStatus.Internal;
 import slimeknights.mantle.command.argument.TagSource;
 import slimeknights.mantle.network.packet.ISimplePacket;
 import slimeknights.tconstruct.TConstruct;
@@ -28,7 +29,9 @@ import slimeknights.tconstruct.tools.stats.HandleMaterialStats;
 import slimeknights.tconstruct.tools.stats.HeadMaterialStats;
 import slimeknights.tconstruct.tools.stats.LimbMaterialStats;
 import slimeknights.tconstruct.tools.stats.PlatingMaterialStats;
+import slimeknights.tconstruct.tools.stats.RepairStats;
 import slimeknights.tconstruct.tools.stats.SkullStats;
+import slimeknights.tconstruct.tools.stats.SlimeStats;
 import slimeknights.tconstruct.tools.stats.StatlessMaterialStats;
 
 import java.util.Collection;
@@ -64,10 +67,17 @@ public final class MaterialRegistry {
   @VisibleForTesting
   static boolean fullyLoaded = false;
 
+  /**
+   * Gets the created instance of the material registry.
+   * Only valid after {@link #init()} has been called in {@link TConstruct}, so do not call during mod constructor or static init.
+   * Registry events are the recommended time to use {@link IMaterialRegistry#registerStatType(MaterialStatType)}.
+   */
   public static IMaterialRegistry getInstance() {
     return INSTANCE.registry;
   }
 
+  /** @apiNote Internal method to initialize the material registry. Addons should never call this as it may break the registry state. */
+  @Internal
   public static void init() {
     // create registry instance
     INSTANCE = new MaterialRegistry();
@@ -118,12 +128,17 @@ public final class MaterialRegistry {
     registry.registerStatType(StatlessMaterialStats.CUIRASS.getType(), ARMOR);
     registry.registerStatType(StatlessMaterialStats.MAILLE.getType(), ARMOR);
     registry.registerStatType(StatlessMaterialStats.SHIELD_CORE.getType(), ARMOR);
+    // slimesuit
+    registry.registerStatType(SlimeStats.TYPE, ARMOR);
+    registry.registerStatType(SkullStats.TYPE, ARMOR);
+    registry.registerStatType(RepairStats.SHELL, ARMOR);
+    registry.registerStatType(RepairStats.LACES, ARMOR);
     // ammo
     registry.registerStatType(StatlessMaterialStats.ARROW_HEAD.getType(), AMMO);
     registry.registerStatType(StatlessMaterialStats.ARROW_SHAFT.getType(), AMMO);
+    registry.registerStatType(StatlessMaterialStats.FLETCHING.getType(), AMMO);
     // misc
     registry.registerStatType(StatlessMaterialStats.REPAIR_KIT.getType());
-    registry.registerStatType(SkullStats.TYPE);
   }
 
   @VisibleForTesting

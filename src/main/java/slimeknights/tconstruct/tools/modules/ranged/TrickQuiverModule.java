@@ -28,7 +28,10 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Predicate;
 
-/** Module implementing trick quiver, with a selectable arrow slot */
+/**
+ * Module implementing trick quiver, with a selectable arrow slot.
+ * TODO 1.21: move to {@link slimeknights.tconstruct.tools.modules.ranged.bow}
+ */
 public enum TrickQuiverModule implements ModifierModule, BowAmmoModifierHook, GeneralInteractionModifierHook, ModifierRemovalHook, InventorySelectionModule {
   INSTANCE;
   public static final SingletonLoader<TrickQuiverModule> LOADER = new SingletonLoader<>(INSTANCE);
@@ -36,9 +39,9 @@ public enum TrickQuiverModule implements ModifierModule, BowAmmoModifierHook, Ge
   /** Key for the currently selected arrow */
   private static final ResourceLocation SELECTED_SLOT = TConstruct.getResource("trick_quiver_selected");
   /** Message when disabling the trick quiver */
-  private static final Component DISABLED = TConstruct.makeTranslation("modifier", "trick_quiver.disabled");
+  private static final String DISABLED = TConstruct.makeTranslationKey("modifier", "trick_quiver.disabled");
   /** Message to display selected slot */
-  private static final String SELECTED = TConstruct.makeTranslationKey("modifier", "trick_quiver.selected");
+  private static final String SELECTED = TConstruct.makeTranslationKey("modifier", "trick_quiver.select");
 
   @Override
   public RecordLoadable<TrickQuiverModule> getLoader() {
@@ -65,12 +68,12 @@ public enum TrickQuiverModule implements ModifierModule, BowAmmoModifierHook, Ge
 
   @Override
   public void onDisableSelection(IToolStackView tool, ModifierEntry modifier, Player player) {
-    player.displayClientMessage(DISABLED, true);
+    player.displayClientMessage(Component.translatable(DISABLED, modifier.getModifier().getDisplayName()), true);
   }
 
   @Override
   public void onInventorySelect(IToolStackView tool, ModifierEntry modifier, Player player, int newIndex, ItemStack stack) {
-    player.displayClientMessage(Component.translatable(SELECTED, stack.getHoverName(), newIndex + 1), true);
+    player.displayClientMessage(Component.translatable(SELECTED, modifier.getModifier().getDisplayName(), stack.getHoverName(), newIndex + 1), true);
   }
 
   @Override

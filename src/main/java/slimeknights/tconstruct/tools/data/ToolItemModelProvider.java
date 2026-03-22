@@ -13,7 +13,10 @@ import java.io.IOException;
 
 import static slimeknights.tconstruct.TConstruct.getResource;
 
-/** Provider for tool models, mostly used for duplicating displays */
+/**
+ * Provider for tool models, mostly used for duplicating displays
+ * TODO 1.21: move to {@link slimeknights.tconstruct.tools.data.client}
+ */
 public class ToolItemModelProvider extends AbstractToolItemModelProvider {
   public ToolItemModelProvider(PackOutput packOutput, ExistingFileHelper existingFileHelper) {
     super(packOutput, existingFileHelper, TConstruct.MOD_ID);
@@ -23,6 +26,7 @@ public class ToolItemModelProvider extends AbstractToolItemModelProvider {
   protected void addModels() throws IOException {
     JsonObject toolBlocking = readJson(getResource("base/tool_blocking"));
     JsonObject shieldBlocking = readJson(getResource("base/shield_blocking"));
+    JsonObject flatBlocking = readJson(getResource("base/flat_blocking"));
 
     // blocking //
     // pickaxe
@@ -48,12 +52,12 @@ public class ToolItemModelProvider extends AbstractToolItemModelProvider {
     armor("travelers", TinkerTools.travelersGear, new Type[] {Type.HELMET},"base", "cuirass", "metal");
     armor("travelers", TinkerTools.travelersGear, new Type[] {Type.CHESTPLATE, Type.LEGGINGS, Type.BOOTS}, "cuirass", "metal");
     armor("plate", TinkerTools.plateArmor, "plating", "maille");
-    armor("slime", TinkerTools.slimesuit, "tool");
+    armor("slime", TinkerTools.slimesuit, "slime");
     // shield
     shield("travelers", TinkerTools.travelersShield, shieldBlocking, "cuirass", "wood");
     shield("plate", TinkerTools.plateShield, readJson(getResource("base/shield_large_blocking")), "plating", "core");
     // misc
-    tool(TinkerTools.flintAndBrick, shieldBlocking, "tool");
+    tool(TinkerTools.flintAndBrick, flatBlocking, "tool");
     // bow
     bow(TinkerTools.longbow, toolBlocking, new LongbowAmmo(new Vec2[] {
       new Vec2(-3, -4), new Vec2(-2, -3), new Vec2(-1, -2)
@@ -61,7 +65,7 @@ public class ToolItemModelProvider extends AbstractToolItemModelProvider {
       new Vec2(-2, -2), new Vec2(0, 0), new Vec2(1, 1)
     }, true, true), "limb_bottom", "limb_top", "bowstring");
     bow(TinkerTools.crossbow, toolBlocking, new CrossbowAmmo(new Vec2(-1, -1), true, false), "bowstring");
-    String[] rodParts = { "string" };
+    String[] rodParts = { "string", "hook" };
     fishingRod(TinkerTools.fishingRod, readJson(getResource("tool/fishing_rod/blocking_display")), rodParts, rodParts);
     tool(TinkerTools.javelin, toolBlocking, "head");
     // staff
@@ -70,7 +74,7 @@ public class ToolItemModelProvider extends AbstractToolItemModelProvider {
     staff(TinkerTools.ichorStaff, toolBlocking);
     staff(TinkerTools.enderStaff, toolBlocking);
     // ancient
-    charged(TinkerTools.meltingPan, shieldBlocking, "head");
+    charged(TinkerTools.meltingPan, flatBlocking, "head");
     bow(TinkerTools.warPick, toolBlocking, new CrossbowAmmo(new Vec2(1, -1), false, true), "bowstring");
     tool(TinkerTools.battlesign, null, "head");
     pulling(TinkerTools.swasher, readJson(getResource("tool/swasher/blocking_display")), AmmoType.NONE, "blade", 2, "barrel");

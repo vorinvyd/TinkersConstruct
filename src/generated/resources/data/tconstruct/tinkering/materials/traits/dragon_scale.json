@@ -11,6 +11,18 @@
         "level": 1,
         "name": "tconstruct:dragonborn"
       }
+    ],
+    "tconstruct:shell": [
+      {
+        "level": 1,
+        "name": "tconstruct:dragonfall"
+      }
+    ],
+    "tconstruct:skull": [
+      {
+        "level": 1,
+        "name": "tconstruct:dragonheart"
+      }
     ]
   }
 }

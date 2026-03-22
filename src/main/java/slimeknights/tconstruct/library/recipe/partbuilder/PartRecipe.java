@@ -3,6 +3,7 @@ package slimeknights.tconstruct.library.recipe.partbuilder;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -60,6 +61,8 @@ public class PartRecipe implements IPartBuilderRecipe, IMultiRecipe<IDisplayPart
   @Getter
   protected final int cost;
   /** If true, this recipe can craft items normally not craftable in the part builder */
+  @Getter
+  @Accessors(fluent = true)
   protected final boolean allowUncraftable;
   /** Recipe result, used to fetch a material */
   protected final IMaterialItem output;
@@ -133,20 +136,32 @@ public class PartRecipe implements IPartBuilderRecipe, IMultiRecipe<IDisplayPart
    * @return  Output of the recipe
    */
   @SuppressWarnings("WeakerAccess")
-  public ItemStack getRecipeOutput(MaterialVariantId material) {
+  public ItemStack getRecipeOutput(MaterialVariantId material, int count) {
     ItemStack stack = output.withMaterial(material);
-    stack.setCount(outputCount);
+    stack.setCount(count);
     return stack;
+  }
+
+  /** @deprecated use {@link #getRecipeOutput(MaterialVariantId, int)} */
+  @Deprecated(forRemoval = true)
+  public ItemStack getRecipeOutput(MaterialVariantId material) {
+    return getRecipeOutput(material, outputCount);
   }
 
   @Override
   public ItemStack assemble(IPartBuilderContainer inv, RegistryAccess access) {
     MaterialVariant material = MaterialVariant.UNKNOWN;
+    int count = outputCount;
     IMaterialValue materialRecipe = inv.getMaterial();
     if (materialRecipe != null) {
       material = materialRecipe.getMaterial();
+      // if no leftover, give them more parts provided we have the patterns for it
+      int value = materialRecipe.getValue();
+      if (!materialRecipe.hasLeftover() && value > cost) {
+        count = outputCount * value / cost;
+      }
     }
-    return this.getRecipeOutput(material.getVariant());
+    return this.getRecipeOutput(material.getVariant(), count);
   }
 
   /** Cache of recipes for display in JEI */

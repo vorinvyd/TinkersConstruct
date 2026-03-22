@@ -123,7 +123,7 @@ public class AdvancementsProvider extends GenericDataProvider {
     Advancement harvestLevel = builder(Items.NETHERITE_INGOT, resource("tools/netherite_tier"), tinkerTool, FrameType.GOAL, builder ->
       builder.addCriterion("harvest_level", InventoryChangeTrigger.TriggerInstance.hasItems(ToolStackItemPredicate.ofTool(new StatInSetPredicate<>(ToolStats.HARVEST_TIER, Tiers.NETHERITE)))));
     builder(Items.TARGET, resource("tools/perfect_aim"), tinkerTool, FrameType.GOAL, builder ->
-      builder.addCriterion("accuracy", InventoryChangeTrigger.TriggerInstance.hasItems(ToolStackItemPredicate.ofTool(ToolStackPredicate.or(
+      builder.addCriterion("accuracy", InventoryChangeTrigger.TriggerInstance.hasItems(ToolStackItemPredicate.ofTool(ToolStackPredicate.and(
         ToolStackPredicate.tag(TinkerTags.Items.BOWS),
         StatInRangePredicate.match(ToolStats.ACCURACY, 1)
       )))));
@@ -170,8 +170,9 @@ public class AdvancementsProvider extends GenericDataProvider {
       with.accept(MaterialIds.queensSlime);
       with.accept(MaterialIds.blazingBone);
       with.accept(MaterialIds.blazewood);
-      with.accept(MaterialIds.ancientHide);
+      with.accept(MaterialIds.jeweledHide);
       with.accept(MaterialIds.knightmetal);
+      with.accept(MaterialIds.knightslime);
       with.accept(MaterialIds.enderslimeVine);
     });
     builder(TinkerTools.travelersGear.get(ArmorItem.Type.HELMET).getRenderTool(), resource("tools/travelers_gear"), tinkerStation, FrameType.TASK, builder ->
@@ -273,75 +274,84 @@ public class AdvancementsProvider extends GenericDataProvider {
       Consumer<ModifierId> with = modifier -> builder.addCriterion(modifier.getPath(), InventoryChangeTrigger.TriggerInstance.hasItems(ToolStackItemPredicate.ofContext(HasModifierPredicate.hasUpgrade(modifier, 1))));
       Consumer<LazyModifier> withL = modifier -> with.accept(modifier.getId());
 
+      // sorted like the modifier tag provider tags
       // general
+      with.accept(ModifierIds.expanded);
       with.accept(ModifierIds.gilded);
       with.accept(ModifierIds.luck);
-      withL.accept(TinkerModifiers.unbreakable);
-      // armor
-      with.accept(ModifierIds.protection);
-      // helmet
-      with.accept(ModifierIds.aquaAffinity);
-      withL.accept(TinkerModifiers.slurping);
-      // chestplate
-      withL.accept(TinkerModifiers.ambidextrous);
-      with.accept(ModifierIds.reach);
-      with.accept(ModifierIds.strength);
-      // leggings
-      with.accept(ModifierIds.pockets);
-      with.accept(ModifierIds.toolBelt);
-      with.accept(ModifierIds.soulBelt);
-      with.accept(ModifierIds.craftingTable);
-      withL.accept(TinkerModifiers.wetting);
-      // boots
-      with.accept(ModifierIds.bouncy);
-      with.accept(ModifierIds.doubleJump);
-      withL.accept(TinkerModifiers.flamewake);
-      with.accept(ModifierIds.frostWalker);
-      with.accept(ModifierIds.longFall);
-      with.accept(ModifierIds.snowdrift);
-      // shield
-      with.accept(ModifierIds.boundless);
-      withL.accept(TinkerModifiers.reflecting);
+      with.accept(ModifierIds.unbreakable);
+      withL.accept(TinkerModifiers.melting);
+
+      // melee
+      with.accept(ModifierIds.blocking);
+      withL.accept(TinkerModifiers.parrying);
+      withL.accept(TinkerModifiers.dualWielding);
+      with.accept(ModifierIds.spilling);
+
       // harvest
-      withL.accept(TinkerModifiers.autosmelt);
+      with.accept(ModifierIds.autosmelt);
       withL.accept(TinkerModifiers.exchanging);
-      withL.accept(TinkerModifiers.expanded);
-      withL.accept(TinkerModifiers.silky);
-      // interact
-      withL.accept(TinkerModifiers.bucketing);
-      withL.accept(TinkerModifiers.firestarter);
+      with.accept(ModifierIds.silky);
+
+      // ranged
+      with.accept(ModifierIds.bulkQuiver);
+      with.accept(ModifierIds.trickQuiver);
+      with.accept(ModifierIds.crystalshot);
+      with.accept(ModifierIds.multishot);
+      with.accept(ModifierIds.ballista);
+      with.accept(ModifierIds.slimeball);
+      with.accept(ModifierIds.sliver);
+      // fishing
+      with.accept(ModifierIds.grapple);
+      // throwing
+      with.accept(ModifierIds.throwing);
+      with.accept(ModifierIds.returning);
+      with.accept(ModifierIds.channeling);
+
+      // interaction
+      with.accept(ModifierIds.bucketing);
+      with.accept(ModifierIds.firestarter);
       with.accept(ModifierIds.glowing);
       with.accept(ModifierIds.pathing);
       with.accept(ModifierIds.stripping);
       with.accept(ModifierIds.tilling);
       with.accept(ModifierIds.brushing);
-      // staff
-      withL.accept(TinkerModifiers.bonking);
-      withL.accept(TinkerModifiers.flinging);
-      withL.accept(TinkerModifiers.springing);
-      withL.accept(TinkerModifiers.warping);
-      // weapon
-      withL.accept(TinkerModifiers.dualWielding);
-      withL.accept(TinkerModifiers.melting);
-      withL.accept(TinkerModifiers.blocking);
-      withL.accept(TinkerModifiers.parrying);
-      // ranged
-      with.accept(ModifierIds.crystalshot);
-      withL.accept(TinkerModifiers.multishot);
-      with.accept(ModifierIds.bulkQuiver);
-      with.accept(ModifierIds.trickQuiver);
       // fluid
-      withL.accept(TinkerModifiers.spitting);
-      with.accept(ModifierIds.spilling);
-      withL.accept(TinkerModifiers.splashing);
+      with.accept(ModifierIds.spitting);
+      with.accept(ModifierIds.splashing);
+      with.accept(ModifierIds.slurping);
+      // staff
+      with.accept(ModifierIds.bonking);
+      with.accept(ModifierIds.flinging);
+      with.accept(ModifierIds.springing);
+      with.accept(ModifierIds.warping);
+      with.accept(ModifierIds.drillAttack);
+
+      // armor
+      with.accept(ModifierIds.protection);
       withL.accept(TinkerModifiers.bursting);
-      // fishing
-      with.accept(ModifierIds.grapple);
-      with.accept(ModifierIds.collecting);
-      // trident
-      with.accept(ModifierIds.throwing);
-      with.accept(ModifierIds.returning);
-      with.accept(ModifierIds.channeling);
+      withL.accept(TinkerModifiers.wetting);
+      // helmet
+      with.accept(ModifierIds.aquaAffinity);
+      // chestplate
+      withL.accept(TinkerModifiers.ambidextrous);
+      with.accept(ModifierIds.reach);
+      with.accept(ModifierIds.strength);
+      with.accept(ModifierIds.wings);
+      // leggings
+      with.accept(ModifierIds.pockets);
+      with.accept(ModifierIds.toolBelt);
+      with.accept(ModifierIds.soulBelt);
+      with.accept(ModifierIds.craftingTable);
+      // boots
+      with.accept(ModifierIds.bouncy);
+      with.accept(ModifierIds.doubleJump);
+      with.accept(ModifierIds.flamewake);
+      with.accept(ModifierIds.frostWalker);
+      with.accept(ModifierIds.snowdrift);
+      // shield
+      with.accept(ModifierIds.boundless);
+      with.accept(ModifierIds.reflecting);
     });
 
     // foundry path
@@ -419,19 +429,29 @@ public class AdvancementsProvider extends GenericDataProvider {
       Consumer<MaterialId> with = mat -> builder.addCriterion(mat.getPath(), InventoryChangeTrigger.TriggerInstance.hasItems(ToolStackItemPredicate.ofContext(
         ToolContextPredicate.and(ToolContextPredicate.set(helmet), new HasMaterialPredicate(mat, 0)))));
       with.accept(MaterialIds.glass);
-      with.accept(MaterialIds.bone);
-      with.accept(MaterialIds.necroticBone);
-      with.accept(MaterialIds.rottenFlesh);
-      with.accept(MaterialIds.enderPearl);
-      with.accept(MaterialIds.venombone);
-      with.accept(MaterialIds.string);
-      with.accept(MaterialIds.darkthread);
+      with.accept(MaterialIds.blaze);
+      // zombie
+      with.accept(MaterialIds.leather);
       with.accept(MaterialIds.iron);
       with.accept(MaterialIds.copper);
-      with.accept(MaterialIds.blazingBone);
+      // spider
+      with.accept(MaterialIds.string);
+      with.accept(MaterialIds.darkthread);
+      // skeleton
+      with.accept(MaterialIds.bone);
+      with.accept(MaterialIds.ice);
+      with.accept(MaterialIds.necroticBone);
+      // piglin
       with.accept(MaterialIds.gold);
       with.accept(MaterialIds.roseGold);
       with.accept(MaterialIds.pigIron);
+      // end
+      with.accept(MaterialIds.enderPearl);
+      with.accept(MaterialIds.dragonScale);
+      // crafted
+      with.accept(MaterialIds.venombone);
+      with.accept(MaterialIds.blazingBone);
+      with.accept(MaterialIds.knightmetal);
     });
     builder(TinkerTools.battlesign.get().getRenderTool(), resource("world/ancient_tools"), tinkersGadgetry, FrameType.CHALLENGE, builder -> {
       Consumer<ItemObject<?>> with = item -> builder.addCriterion(item.getId().getPath(), hasItem(item));

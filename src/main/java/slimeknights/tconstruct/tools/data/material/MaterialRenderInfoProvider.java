@@ -22,7 +22,6 @@ public class MaterialRenderInfoProvider extends AbstractMaterialRenderInfoProvid
 
     // tier 1
     buildRenderInfo(MaterialIds.flint).color(0x3D3C3C).fallbacks("crystal", "rock", "stick");
-    buildRenderInfo(MaterialIds.basalt);
     buildRenderInfo(MaterialIds.bone).color(0xE8E5D2).fallbacks("bone", "rock");
     buildRenderInfo(MaterialIds.chorus);
     buildRenderInfo(MaterialIds.string).color(0xFFFFFF);
@@ -30,6 +29,9 @@ public class MaterialRenderInfoProvider extends AbstractMaterialRenderInfoProvid
     buildRenderInfo(MaterialIds.vine).color(0x48B518).fallbacks("vine");
     buildRenderInfo(MaterialIds.ice).color(0x74ABFE);
     buildRenderInfo(MaterialIds.cactus).color(0x649832);
+    // tier 1 - ammo
+    buildRenderInfo(MaterialIds.paper);
+    redirect(MaterialIds.leaves, MaterialIds.vine);
     // tier 1 - wood
     buildRenderInfo(MaterialIds.wood).color(0x876627).fallbacks("wood", "stick", "primitive");
     buildRenderInfo(MaterialIds.crimson);
@@ -38,16 +40,20 @@ public class MaterialRenderInfoProvider extends AbstractMaterialRenderInfoProvid
     // tier 1 - stone
     redirect(MaterialIds.rock, MaterialIds.stone);
     buildRenderInfo(MaterialIds.stone).color(0xB1AFAD);
-    buildRenderInfo(MaterialIds.andesite);
     buildRenderInfo(MaterialIds.diorite);
     buildRenderInfo(MaterialIds.granite);
-    buildRenderInfo(MaterialIds.deepslate);
     buildRenderInfo(MaterialIds.blackstone);
+    buildRenderInfo(MaterialIds.basalt);
+    redirect(MaterialIds.andesite, MaterialIds.stone);
+    redirect(MaterialIds.calcite, MaterialIds.diorite);
+    redirect(MaterialIds.deepslate, MaterialIds.basalt);
     // tier 1 - wool
-    redirect(MaterialIds.wool, MaterialVariantId.create(MaterialIds.wool, DyeColor.WHITE.getName()));
+    MaterialVariantId whiteWool = MaterialVariantId.create(MaterialIds.wool, DyeColor.WHITE.getName());
+    redirect(MaterialIds.wool, whiteWool);
     for (DyeColor color : DyeColor.values()) {
       buildRenderInfo(MaterialVariantId.create(MaterialIds.wool, color.getName()));
     }
+    redirect(MaterialIds.feather, whiteWool);
 
     // tier 2
     buildRenderInfo(MaterialIds.iron).color(0xD8D8D8).fallbacks("metal");
@@ -70,6 +76,11 @@ public class MaterialRenderInfoProvider extends AbstractMaterialRenderInfoProvid
     buildRenderInfo(MaterialIds.bloodshroom);
     buildRenderInfo(MaterialIds.enderbark);
     buildRenderInfo(MaterialIds.slimeskin);
+    // slimeball
+    redirect(MaterialIds.slimeball, MaterialIds.earthslime);
+    redirect(MaterialVariantId.create(MaterialIds.slimeball, "sky"),   MaterialIds.skyslime);
+    redirect(MaterialVariantId.create(MaterialIds.slimeball, "ichor"), MaterialIds.ichor);
+    redirect(MaterialVariantId.create(MaterialIds.slimeball, "ender"), MaterialIds.enderslime);
 
     // tier 3
     buildRenderInfo(MaterialIds.slimesteel).color(0x46ECE7).fallbacks("slime_metal", "metal");
@@ -89,8 +100,10 @@ public class MaterialRenderInfoProvider extends AbstractMaterialRenderInfoProvid
     buildRenderInfo(MaterialIds.hepatizon).color(0x60496b).fallbacks("metal");
     buildRenderInfo(MaterialIds.manyullyn).color(0x9261cc).fallbacks("metal");
     buildRenderInfo(MaterialIds.knightmetal).color(0xC4D6AE).fallbacks("metal");
+    buildRenderInfo(MaterialIds.knightslime);
     buildRenderInfo(MaterialIds.blazingBone).color(0xF2D500).fallbacks("bone", "rock").luminosity(15);
     buildRenderInfo(MaterialIds.blazewood).fallbacks("wood", "stick").luminosity(7);
+    buildRenderInfo(MaterialIds.jeweledHide);
     buildRenderInfo(MaterialIds.ancientHide);
     buildRenderInfo(MaterialIds.ancient);
     buildRenderInfo(MaterialIds.enderslimeVine).color(0xa92dff).fallbacks("vine");
@@ -120,6 +133,7 @@ public class MaterialRenderInfoProvider extends AbstractMaterialRenderInfoProvid
 
     // tier 4 compat
     buildRenderInfo(MaterialIds.fiery).color(0x893D14).fallbacks("metal").luminosity(15);
+    buildRenderInfo(MaterialIds.nicrosil).color(0xD9E6DC);
 
     // ammo
     buildRenderInfo(MaterialIds.amethyst);
@@ -131,17 +145,24 @@ public class MaterialRenderInfoProvider extends AbstractMaterialRenderInfoProvid
     buildRenderInfo(MaterialIds.blaze);
     buildRenderInfo(MaterialIds.enderPearl);
     buildRenderInfo(MaterialIds.quartz);
-    buildRenderInfo(MaterialIds.ichor);
+    buildRenderInfo(MaterialIds.ichor).luminosity(10);
+    buildRenderInfo(MaterialIds.magma).luminosity(5);
+    buildRenderInfo(MaterialIds.glowstone).luminosity(15);
+    buildRenderInfo(MaterialIds.gunpowder);
+    buildRenderInfo(MaterialIds.redstone);
+    buildRenderInfo(MaterialIds.turtle);
     buildRenderInfo(MaterialIds.dragonScale);
+    buildRenderInfo(MaterialIds.endRod);
+    redirect(MaterialIds.magnetite, MaterialIds.steel);
+    redirect(MaterialIds.kobold, MaterialIds.cobalt);
+    redirect(MaterialIds.shulker, MaterialIds.chorus);
+    redirect(MaterialIds.knightly, MaterialIds.knightmetal);
 
     // plate
     buildRenderInfo(MaterialIds.gold).color(0xFDF55F).fallbacks("metal");
     buildRenderInfo(MaterialIds.obsidian);
-    // slimeskull
-    buildRenderInfo(MaterialIds.rottenFlesh);
     // slimesuit
     buildRenderInfo(MaterialIds.blood);
-    buildRenderInfo(MaterialIds.magma);
     buildRenderInfo(MaterialIds.clay);
     buildRenderInfo(MaterialIds.honey);
     buildRenderInfo(MaterialIds.phantom);

@@ -79,8 +79,9 @@ public class ModifierManager extends SimpleJsonResourceReloadListener {
   /** GSON instance for loading dynamic modifiers */
   public static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
 
-  /** ID of the default modifier */
-  public static final ModifierId EMPTY = new ModifierId(TConstruct.MOD_ID, "empty");
+  /** @deprecated use {@link ModifierId#EMPTY} */
+  @Deprecated
+  public static final ModifierId EMPTY = ModifierId.EMPTY;
 
   /** Singleton instance of the modifier manager */
   public static final ModifierManager INSTANCE = new ModifierManager();
@@ -142,6 +143,7 @@ public class ModifierManager extends SimpleJsonResourceReloadListener {
     conditionContext = event.getConditionContext();
   }
 
+  @SuppressWarnings("removal")
   @Override
   protected void apply(Map<ResourceLocation,JsonElement> splashList, ResourceManager pResourceManager, ProfilerFiller pProfiler) {
     long time = System.nanoTime();
@@ -192,7 +194,8 @@ public class ModifierManager extends SimpleJsonResourceReloadListener {
     // load modifier tags
     TagLoader<Modifier> tagLoader = new TagLoader<>(id -> {
       Modifier modifier = ModifierManager.getValue(new ModifierId(id));
-      if (modifier == defaultValue) {
+      // only allow the default modifier if it's explicitly set to empty
+      if (modifier == defaultValue && !id.equals(EMPTY)) {
         return Optional.empty();
       }
       return Optional.of(modifier);
@@ -264,8 +267,14 @@ public class ModifierManager extends SimpleJsonResourceReloadListener {
   }
 
   /** Creates context for modifier parsing */
+  public static TypedMapBuilder contextBuilder(ResourceLocation modifier) {
+    return TypedMapBuilder.builder().put(ContextKey.ID, modifier).put(ContextKey.DEBUG, "Modifier " + modifier);
+  }
+
+  /** @deprecated use {@link #contextBuilder(ResourceLocation)} */
+  @Deprecated(forRemoval = true)
   public static TypedMap createContext(ResourceLocation modifier) {
-    return TypedMapBuilder.builder().put(ContextKey.ID, modifier).put(ContextKey.DEBUG, "Modifier " + modifier).build();
+    return contextBuilder(modifier).build();
   }
 
   /** Loads a modifier from JSON */
@@ -293,7 +302,7 @@ public class ModifierManager extends SimpleJsonResourceReloadListener {
       }
 
       // fallback to actual modifier
-      Modifier modifier = ComposableModifier.LOADER.deserialize(json, createContext(key));
+      Modifier modifier = ComposableModifier.LOADER.deserialize(json, contextBuilder(key).put(ContextKey.CONDITION_CONTEXT, conditionContext).build());
       modifier.setId(new ModifierId(key));
       return modifier;
     } catch (JsonSyntaxException e) {

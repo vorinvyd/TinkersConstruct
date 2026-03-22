@@ -15,10 +15,10 @@ import net.minecraft.world.phys.Vec3;
 import slimeknights.mantle.data.loadable.primitive.BooleanLoadable;
 import slimeknights.mantle.data.loadable.primitive.FloatLoadable;
 import slimeknights.mantle.data.loadable.record.RecordLoadable;
-import slimeknights.mantle.data.registry.GenericLoaderRegistry.IHaveLoader;
 import slimeknights.tconstruct.library.modifiers.ModifierEntry;
 import slimeknights.tconstruct.library.modifiers.ModifierHooks;
 import slimeknights.tconstruct.library.modifiers.hook.combat.MeleeHitModifierHook;
+import slimeknights.tconstruct.library.modifiers.hook.combat.MonsterMeleeHitModifierHook;
 import slimeknights.tconstruct.library.modifiers.hook.ranged.LauncherHitModifierHook;
 import slimeknights.tconstruct.library.modifiers.modules.ModifierModule;
 import slimeknights.tconstruct.library.module.HookProvider;
@@ -30,8 +30,9 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 /** Module causing a lighting strike at the target position */
-public record ChannelingModule(float clearChance, float rainChance, float thunderChance, boolean allowMelee) implements ModifierModule, MeleeHitModifierHook, LauncherHitModifierHook {
-  private static final List<ModuleHook<?>> DEFAULT_HOOKS = HookProvider.<ChannelingModule>defaultHooks(ModifierHooks.MELEE_HIT, ModifierHooks.LAUNCHER_HIT);
+public record ChannelingModule(float clearChance, float rainChance, float thunderChance, boolean allowMelee) implements ModifierModule, MeleeHitModifierHook, MonsterMeleeHitModifierHook.RedirectAfter, LauncherHitModifierHook {
+  private static final List<ModuleHook<?>> MELEE_HOOKS = HookProvider.<ChannelingModule>defaultHooks(ModifierHooks.MELEE_HIT, ModifierHooks.MONSTER_MELEE_HIT, ModifierHooks.LAUNCHER_HIT);
+  private static final List<ModuleHook<?>> PROJECTILE_HOOKS = HookProvider.<ChannelingModule>defaultHooks(ModifierHooks.MELEE_HIT, ModifierHooks.LAUNCHER_HIT);
   public static final RecordLoadable<ChannelingModule> LOADER = RecordLoadable.create(
     FloatLoadable.PERCENT.requiredField("chance_clear", ChannelingModule::clearChance),
     FloatLoadable.PERCENT.requiredField("chance_rain", ChannelingModule::rainChance),
@@ -40,13 +41,13 @@ public record ChannelingModule(float clearChance, float rainChance, float thunde
     ChannelingModule::new);
 
   @Override
-  public RecordLoadable<? extends IHaveLoader> getLoader() {
+  public RecordLoadable<ChannelingModule> getLoader() {
     return LOADER;
   }
 
   @Override
   public List<ModuleHook<?>> getDefaultHooks() {
-    return DEFAULT_HOOKS;
+    return allowMelee ? MELEE_HOOKS : PROJECTILE_HOOKS;
   }
 
   /** Attempts to summon lightning at the target */

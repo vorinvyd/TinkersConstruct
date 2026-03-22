@@ -5,6 +5,7 @@ import slimeknights.tconstruct.TConstruct;
 import slimeknights.tconstruct.library.client.data.material.AbstractPartSpriteProvider;
 import slimeknights.tconstruct.library.materials.stats.MaterialStatsId;
 import slimeknights.tconstruct.tools.stats.PlatingMaterialStats;
+import slimeknights.tconstruct.tools.stats.SlimeStats;
 import slimeknights.tconstruct.tools.stats.StatlessMaterialStats;
 
 /**
@@ -17,6 +18,8 @@ public class TinkerPartSpriteProvider extends AbstractPartSpriteProvider {
   public static final MaterialStatsId ARMOR_PLATING = new MaterialStatsId(TConstruct.MOD_ID, "armor_plating");
   public static final MaterialStatsId ARMOR_MAILLE = new MaterialStatsId(TConstruct.MOD_ID, "armor_maille");
   public static final MaterialStatsId ARMOR_CUIRASS = new MaterialStatsId(TConstruct.MOD_ID, "armor_cuirass");
+  public static final MaterialStatsId INGOT = new MaterialStatsId(TConstruct.MOD_ID, "ingot");
+  public static final MaterialStatsId STORAGE_BLOCK = new MaterialStatsId(TConstruct.MOD_ID, "storage_block");
 
   public TinkerPartSpriteProvider() {
     super(TConstruct.MOD_ID);
@@ -41,6 +44,10 @@ public class TinkerPartSpriteProvider extends AbstractPartSpriteProvider {
     addBinding("tool_binding");
     addBinding("tough_binding");
     addPart("repair_kit", StatlessMaterialStats.REPAIR_KIT.getIdentifier());
+    addPart("ingot", INGOT);
+    addTexture("block/storage/fallback", STORAGE_BLOCK);
+    // fishing hook is an arrow head
+    addTexture("tinker_armor/fishing_hook/material", StatlessMaterialStats.ARROW_HEAD.getIdentifier());
 
     // travelers textures
     addTexture("tinker_armor/travelers/metal_armor", ARMOR_PLATING).disallowAnimated();
@@ -89,14 +96,14 @@ public class TinkerPartSpriteProvider extends AbstractPartSpriteProvider {
     addSprite("staff/large_modifiers/tconstruct_embellishment", WOOD);
 
     // slimesuit textures - the armor model won't be animated, so don't animate the item
-    addSprite("armor/slime/skull_modifiers/tconstruct_embellishment", SLIMESUIT).disallowAnimated();
-    addSprite("armor/slime/skull_modifiers/broken/tconstruct_embellishment", SLIMESUIT).disallowAnimated();
-    addSprite("armor/slime/wings_modifiers/tconstruct_embellishment", SLIMESUIT).disallowAnimated();
-    addSprite("armor/slime/wings_modifiers/broken/tconstruct_embellishment", SLIMESUIT).disallowAnimated();
-    addSprite("armor/slime/shell_modifiers/tconstruct_embellishment", SLIMESUIT).disallowAnimated();
-    addSprite("armor/slime/shell_modifiers/broken/tconstruct_embellishment", SLIMESUIT).disallowAnimated();
-    addSprite("armor/slime/boot_modifiers/tconstruct_embellishment", SLIMESUIT).disallowAnimated();
-    addSprite("armor/slime/boot_modifiers/broken/tconstruct_embellishment", SLIMESUIT).disallowAnimated();
+    addSprite("armor/slime/helmet/slime", SlimeStats.ID).disallowAnimated();
+    addSprite("armor/slime/helmet/slime_broken", SlimeStats.ID).disallowAnimated();
+    addSprite("armor/slime/wings/slime", SlimeStats.ID).disallowAnimated();
+    addSprite("armor/slime/wings/slime_broken", SlimeStats.ID).disallowAnimated();
+    addSprite("armor/slime/leggings/slime", SlimeStats.ID).disallowAnimated();
+    addSprite("armor/slime/leggings/slime_broken", SlimeStats.ID).disallowAnimated();
+    addSprite("armor/slime/boots/slime", SlimeStats.ID).disallowAnimated();
+    addSprite("armor/slime/boots/slime_broken", SlimeStats.ID).disallowAnimated();
     addTexture("tinker_armor/slime/armor", SLIMESUIT).disallowAnimated();
     addTexture("tinker_armor/slime/leggings", SLIMESUIT).disallowAnimated();
     addTexture("tinker_armor/slime/wings", SLIMESUIT).disallowAnimated();
@@ -131,13 +138,18 @@ public class TinkerPartSpriteProvider extends AbstractPartSpriteProvider {
       .addBreakableBowstring("bowstring").addBowstring("bowstring_1").addBowstring("bowstring_2").addBowstring("bowstring_3");
     buildTool("fishing_rod")
       .addLimb("rod")
-      .addBreakableBowstring("string").addBowstring("string_cast");
+      .addBreakableBowstring("string").addBowstring("string_cast")
+      .addBreakablePart("hook", StatlessMaterialStats.ARROW_HEAD.getIdentifier())
+      .addPart("hook_cast", StatlessMaterialStats.ARROW_HEAD.getIdentifier());
     buildTool("javelin").withLarge().addBreakableHead("head").addLimb("guard").addHandle("handle").addGrip("grip");
     buildTool("ammo")
       // arrow
       .addArrowHead("arrow_head").addPart("arrow_shaft", StatlessMaterialStats.ARROW_SHAFT)
+      .addPart("arrow_feather", StatlessMaterialStats.FLETCHING)
       // shuriken
-      .addArrowHead("shuriken_top").addArrowHead("shuriken_bottom");
+      .addArrowHead("shuriken_top").addArrowHead("shuriken_bottom")
+      // throwing axe - reuses arrow shaft
+      .addArrowHead("axe_head");
 
     // ancient tools
     buildTool("melting_pan").skipVariants().addBreakablePart("head", PlatingMaterialStats.SHIELD.getId()).addLimb("handle");

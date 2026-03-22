@@ -15,6 +15,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTab.ItemDisplayParameters;
+import net.minecraft.world.item.CreativeModeTab.Output;
 import net.minecraft.world.item.DispensibleContainerItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -67,6 +68,7 @@ import slimeknights.tconstruct.fluids.util.BottleBrewingRecipe;
 import slimeknights.tconstruct.fluids.util.EmptyBottleIntoEmpty;
 import slimeknights.tconstruct.fluids.util.EmptyBottleIntoWater;
 import slimeknights.tconstruct.fluids.util.FillBottle;
+import slimeknights.tconstruct.library.materials.definition.MaterialId;
 import slimeknights.tconstruct.library.recipe.FluidValues;
 import slimeknights.tconstruct.shared.TinkerEffects;
 import slimeknights.tconstruct.shared.TinkerFood;
@@ -74,6 +76,7 @@ import slimeknights.tconstruct.shared.block.SlimeType;
 import slimeknights.tconstruct.smeltery.TinkerSmeltery;
 import slimeknights.tconstruct.smeltery.item.CopperCanItem;
 import slimeknights.tconstruct.smeltery.item.TankItem;
+import slimeknights.tconstruct.tools.data.material.MaterialIds;
 import slimeknights.tconstruct.tools.network.FluidDataSerializer;
 import slimeknights.tconstruct.world.TinkerWorld;
 
@@ -204,7 +207,7 @@ public final class TinkerFluids extends TinkerModule {
   public static final FlowingFluidObject<ForgeFlowingFluid> moltenDuralumin = FLUIDS.registerMetal("molten_duralumin").type(hot("molten_duralumin").temperature(925).lightLevel(10)).block(createBurning(MapColor.COLOR_LIGHT_GREEN, 10, 10, 6f)).bucket().commonTag().flowing();
   public static final FlowingFluidObject<ForgeFlowingFluid> moltenBendalloy = FLUIDS.registerMetal("molten_bendalloy").type(hot("molten_bendalloy").temperature(400).lightLevel(9)).block(createBurning(MapColor.SNOW, 9, 10, 6f)).bucket().commonTag().flowing();
   // twilight
-  public static final FlowingFluidObject<ForgeFlowingFluid> moltenSteeleaf = FLUIDS.registerMetal("molten_steeleaf").type(hot("molten_steeleaf").temperature(1334).lightLevel(10)).block(createBurning(MapColor.COLOR_GREEN, 10, 10, 6f)).bucket().flowing();
+  public static final FlowingFluidObject<ForgeFlowingFluid> moltenSteeleaf = FLUIDS.registerMetal("molten_steeleaf").type(hot("molten_steeleaf").temperature(1234).lightLevel(10)).block(createBurning(MapColor.COLOR_GREEN, 10, 10, 6f)).bucket().flowing();
   public static final FlowingFluidObject<ForgeFlowingFluid> fieryLiquid = FLUIDS.register("fiery_liquid").type(hot("fiery_liquid").temperature(1800).lightLevel(15)).block(createBurning(MapColor.CRIMSON_HYPHAE, 15, 20, 6f)).tickRate(30).bucket().flowing();
 
   // fluid data serializer
@@ -446,58 +449,67 @@ public final class TinkerFluids extends TinkerModule {
     output.accept(moltenHepatizon);
     output.accept(moltenNetherite);
     output.accept(moltenKnightmetal);
+    output.accept(moltenKnightslime);
     // future: soulsteel
-    // future: knightslime
 
     // compat ores
     acceptMolten(output, moltenTin);
-    acceptMolten(output, moltenAluminum);
-    acceptMolten(output, moltenLead);
-    acceptMolten(output, moltenSilver);
+    acceptCompat(output, moltenAluminum, MaterialIds.aluminum);
+    acceptCompat(output, moltenLead, MaterialIds.lead);
+    acceptCompat(output, moltenSilver, MaterialIds.silver);
     acceptMolten(output, moltenNickel);
     acceptMolten(output, moltenZinc);
     acceptMolten(output, moltenPlatinum);
     acceptMolten(output, moltenTungsten);
-    acceptMolten(output, moltenOsmium);
-    acceptMolten(output, moltenUranium);
+    acceptCompat(output, moltenOsmium, MaterialIds.osmium);
+    acceptMolten(output, moltenUranium, MaterialIds.necronium);
     acceptMolten(output, moltenChromium);
     acceptMolten(output, moltenCadmium);
     // compat alloys
-    acceptMolten(output, moltenBronze, "tin");
-    acceptMolten(output, moltenBrass, "zinc");
-    acceptMolten(output, moltenElectrum, "silver");
-    acceptMolten(output, moltenInvar, "nickel");
-    acceptMolten(output, moltenConstantan, "nickel");
-    acceptCompat(output, moltenPewter, "pewter", "tin", "lead");
+    acceptCompat(output, moltenBronze, MaterialIds.bronze);
+    acceptMolten(output, moltenBrass, MaterialIds.platedSlimewood);
+    acceptCompat(output, moltenElectrum, MaterialIds.electrum);
+    acceptCompat(output, moltenInvar, MaterialIds.invar);
+    acceptCompat(output, moltenConstantan, MaterialIds.constantan);
+    acceptCompat(output, moltenPewter, MaterialIds.pewter);
+    acceptMolten(output, moltenNicrosil, MaterialIds.nicrosil);
     acceptMolten(output, moltenEnderium);
     acceptMolten(output, moltenLumium);
     acceptMolten(output, moltenSignalum);
     acceptMolten(output, moltenRefinedGlowstone);
     acceptMolten(output, moltenRefinedObsidian);
-    acceptMolten(output, moltenNicrosil);
     acceptMolten(output, moltenDuralumin);
     acceptMolten(output, moltenBendalloy);
-    acceptMolten(output, moltenSteeleaf);
-    acceptCompat(output, fieryLiquid, "fiery");
+    acceptCompat(output, moltenSteeleaf, MaterialIds.steeleaf);
+    acceptCompat(output, fieryLiquid, "fiery", MaterialIds.fiery);
     BuiltInRegistries.POTION.holders().filter(holder -> {
       Potion potion = holder.get();
       return potion != Potions.EMPTY && potion != Potions.WATER;
-    }).forEachOrdered(holder -> {
-      output.accept(PotionFluidType.potionBucket(holder.key()));
-    });
+    }).forEachOrdered(holder ->
+      output.accept(PotionFluidType.potionBucket(holder.key())));
 
     // add copper cans, tanks, and lanterns for all the fluids
     CopperCanItem.addFilledVariants(output::accept);
     TankItem.addFilledVariants(output::accept);
   }
 
-  /** Accepts the given item if any of the listed ingots are present */
-  private static void acceptCompat(CreativeModeTab.Output output, ItemLike item, String... ingots) {
-    for (String ingot : ingots) {
-      if (acceptIfTag(output, item, ItemTags.create(commonResource("ingots/" + ingot)))) {
-        break;
-      }
+  /**
+   * Accepts the given item if the passed ingot is present
+   */
+  private static void acceptCompat(Output output, ItemLike item, String ingot) {
+    acceptIfTag(output, item, ItemTags.create(commonResource("ingots/" + ingot)));
+  }
+
+  /** Accepts the given item if the passed ingot or material is present */
+  private static void acceptCompat(CreativeModeTab.Output output, ItemLike item, String ingot, MaterialId material) {
+    if (!acceptIfMaterial(output, item, material)) {
+      acceptCompat(output, item, ingot);
     }
+  }
+
+  /** Accepts the given item if the passed material or same named ingot is present */
+  private static void acceptCompat(CreativeModeTab.Output output, ItemLike item, MaterialId material) {
+    acceptCompat(output, item, material.getPath(), material);
   }
 
   /** Accepts the given item if the ingot named after the fluid is present */
@@ -505,9 +517,9 @@ public final class TinkerFluids extends TinkerModule {
     acceptCompat(output, fluid, withoutMolten(fluid));
   }
 
-  /** Accepts the given item if the ingot named after the fluid or the passed ingot name is present */
-  private static void acceptMolten(CreativeModeTab.Output output, FluidObject<?> fluid, String ingot) {
-    acceptCompat(output, fluid, withoutMolten(fluid), ingot);
+  /** Accepts the given item if the ingot named after the fluid or the material is present */
+  private static void acceptMolten(CreativeModeTab.Output output, FluidObject<?> fluid, MaterialId material) {
+    acceptCompat(output, fluid, withoutMolten(fluid), material);
   }
 
   /** Length of the molten prefix */

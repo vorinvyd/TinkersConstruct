@@ -1,11 +1,5 @@
 {
   "type": "forge:conditional",
-  "conditions": [
-    {
-      "type": "mantle:tag_filled",
-      "tag": "forge:ingots/nicrosil"
-    }
-  ],
   "recipes": [
     {
       "conditions": [
@@ -53,10 +47,6 @@
           "values": [
             {
               "type": "mantle:tag_filled",
-              "tag": "forge:ingots/tin"
-            },
-            {
-              "type": "mantle:tag_filled",
               "tag": "forge:ingots/nickel"
             }
           ]
@@ -70,8 +60,8 @@
             "tag": "forge:molten_nickel"
           },
           {
-            "amount": 90,
-            "tag": "forge:molten_tin"
+            "amount": 100,
+            "tag": "tconstruct:molten_emerald"
           },
           {
             "amount": 100,
@@ -130,8 +120,8 @@
             "tag": "forge:molten_tin"
           },
           {
-            "amount": 90,
-            "tag": "forge:molten_iron"
+            "amount": 100,
+            "tag": "tconstruct:molten_emerald"
           },
           {
             "amount": 100,
